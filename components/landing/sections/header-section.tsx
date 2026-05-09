@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { Logo } from "@/components/logo";
 
 export function HeaderSection() {
   const { data: session, status } = useSession();
@@ -10,23 +10,16 @@ export function HeaderSection() {
   const username = session?.user?.name || session?.user?.email?.split("@")[0];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-primary bg-background/95 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link
           href="/"
           className="group flex items-center gap-1 rounded-md px-1.5 py-1 -mx-1.5 transition-colors hover:bg-muted/40"
         >
-          <Image
-            src="/android-chrome-512x512.png"
-            alt="Logo"
-            width={28}
-            height={28}
-            className="rounded-md ring-1 ring-primary/20 shadow-sm"
-            priority
-          />
-          <span className="text-[16px] font-bold tracking-[-0.01em] leading-none text-foreground">
-            <span className="text-primary">Chat</span>
-            <span className="ml-0.5">App</span>
+          <Logo size={32} />
+          <span className="text-[16px] font-black uppercase tracking-[0.1em] leading-none text-foreground ml-2">
+            <span className="text-primary">Dark</span>
+            <span className="ml-1 text-white">Chat</span>
           </span>
         </Link>
 

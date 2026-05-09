@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { registerAction } from "@/app/actions/auth";
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -40,27 +41,20 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Form */}
-        <div className="bg-white p-8 space-y-6 rounded-2xl shadow-lg border border-border">
-          <Link href="/" className="flex items-center justify-center gap-1.5">
-            <Image
-              src="/android-chrome-512x512.png"
-              alt="Logo"
-              width={42}
-              height={42}
-              className="rounded-md ring-1 ring-primary/20 shadow-sm"
-              priority
-            />
-            <span className="text-lg font-bold tracking-[-0.01em] leading-none text-foreground">
-              <span className="text-primary">Chat</span>
-              <span className="ml-0.5">App</span>
+        <div className="bg-secondary p-8 space-y-6 rounded-sm shadow-2xl border border-primary">
+          <Link href="/" className="flex items-center justify-center gap-2">
+            <Logo size={48} />
+            <span className="text-xl font-black uppercase tracking-[0.1em] leading-none text-foreground">
+              <span className="text-primary">Dark</span>
+              <span className="ml-1 text-white">Chat</span>
             </span>
           </Link>
 
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 border border-red-200 px-4 py-3 rounded-lg">
+            <div className="text-sm text-red-400 bg-red-950/20 border border-red-900/50 px-4 py-3 rounded-sm">
               {error}
             </div>
           )}
@@ -79,7 +73,7 @@ export default function RegisterPage() {
                   type="text"
                   required
                   placeholder="Your full name"
-                  className="w-full pl-11 pr-4 py-3 bg-input text-sm text-foreground placeholder-muted-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                  className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
                 />
               </div>
             </div>
@@ -97,7 +91,7 @@ export default function RegisterPage() {
                   type="email"
                   required
                   placeholder="Enter your email"
-                  className="w-full pl-11 pr-4 py-3 bg-input text-sm text-foreground placeholder-muted-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                  className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
                 />
               </div>
             </div>
@@ -115,7 +109,7 @@ export default function RegisterPage() {
                   type={showPassword ? "text" : "password"}
                   required
                   placeholder="At least 8 characters"
-                  className="w-full pl-11 pr-11 py-3 bg-input text-sm text-foreground placeholder-muted-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                  className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
                 />
                 <button
                   type="button"
@@ -140,7 +134,7 @@ export default function RegisterPage() {
                   type={showConfirmPassword ? "text" : "password"}
                   required
                   placeholder="Confirm your password"
-                  className="w-full pl-11 pr-11 py-3 bg-input text-sm text-foreground placeholder-muted-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                  className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
                 />
                 <button
                   type="button"
@@ -155,9 +149,9 @@ export default function RegisterPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-primary hover:bg-accent text-primary-foreground py-3 rounded-lg font-semibold transition-colors duration-200 cursor-pointer"
+              className="w-full bg-primary hover:opacity-90 text-black py-3 rounded-sm font-bold uppercase transition-opacity duration-200 cursor-pointer"
             >
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
             </button>
           </form>
         </div>

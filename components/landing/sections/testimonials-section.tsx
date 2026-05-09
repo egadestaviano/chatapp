@@ -5,100 +5,65 @@ function TestimonialsIllustration() {
   return (
     <div className="relative mx-auto w-full max-w-[300px]">
       {/* Phone frame */}
-      <div className="relative rounded-[2rem] border border-border bg-background shadow-xl ring-8 ring-primary/10 overflow-hidden">
-        {/* Phone notch */}
-        <div className="flex h-6 items-center justify-center bg-primary">
-          <div className="h-1 w-12 rounded-full bg-primary-foreground/40" />
+      <div className="relative rounded-sm border border-primary bg-[#0A0A0A] shadow-2xl ring-1 ring-primary/20 overflow-hidden">
+        {/* Phone notch area */}
+        <div className="flex h-4 items-center justify-center bg-primary">
+          <div className="h-0.5 w-8 rounded-full bg-black/40" />
         </div>
 
         {/* Chat header */}
-        <div className="flex items-center gap-3 border-b border-border bg-card/40 px-4 py-3">
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-primary text-[12px] font-semibold text-primary-foreground">
+        <div className="flex items-center gap-3 border-b border-white/5 bg-secondary/20 px-4 py-3">
+          <div className="grid h-8 w-8 place-items-center rounded-sm bg-primary text-[11px] font-bold text-black uppercase">
             E
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[12.5px] font-semibold text-foreground truncate">Emily</p>
-            <p className="font-mono text-[10px] text-primary">● Active now</p>
+            <p className="text-[12px] font-bold text-foreground truncate uppercase tracking-wider">Emily</p>
+            <p className="font-mono text-[9px] text-primary uppercase">● Active</p>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex flex-col gap-2.5 px-4 py-4">
+        <div className="flex flex-col gap-3 px-4 py-5">
           {/* Other - left */}
           <div className="flex items-end gap-1.5">
-            <div className="grid h-6 w-6 place-items-center rounded-full bg-muted text-[9px] font-semibold text-foreground shrink-0">
+            <div className="grid h-6 w-6 place-items-center rounded-sm bg-secondary border border-white/10 text-[9px] font-bold text-foreground shrink-0 uppercase">
               E
             </div>
-            <div className="max-w-[78%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2">
-              <p className="text-[12px] leading-snug text-foreground">Hey! How are you?</p>
+            <div className="max-w-[80%] rounded-sm border border-white/10 bg-black px-3 py-2">
+              <p className="text-[11px] leading-snug text-white">The contrast is perfect.</p>
             </div>
           </div>
 
           {/* Me - right */}
           <div className="flex justify-end">
-            <div className="max-w-[78%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 shadow-sm">
-              <p className="text-[12px] leading-snug text-primary-foreground">I&apos;m doing great ✨</p>
+            <div className="max-w-[80%] rounded-sm bg-primary px-3 py-2">
+              <p className="text-[11px] font-bold leading-snug text-black">Zero distractions. ✨</p>
             </div>
           </div>
 
           {/* Other - left */}
           <div className="flex items-end gap-1.5">
-            <div className="grid h-6 w-6 place-items-center rounded-full bg-muted text-[9px] font-semibold text-foreground shrink-0">
+            <div className="grid h-6 w-6 place-items-center rounded-sm bg-secondary border border-white/10 text-[9px] font-bold text-foreground shrink-0 uppercase">
               E
             </div>
-            <div className="max-w-[78%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2">
-              <p className="text-[12px] leading-snug text-foreground">Let&apos;s meet tomorrow!</p>
-            </div>
-          </div>
-
-          {/* Me - right */}
-          <div className="flex justify-end">
-            <div className="max-w-[78%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 shadow-sm">
-              <p className="text-[12px] leading-snug text-primary-foreground">Sure, sounds good 👍</p>
-            </div>
-          </div>
-
-          {/* Typing indicator */}
-          <div className="mt-1 flex items-end gap-1.5">
-            <div className="grid h-6 w-6 place-items-center rounded-full bg-muted text-[9px] font-semibold text-foreground shrink-0">
-              E
-            </div>
-            <div className="rounded-2xl rounded-bl-sm bg-muted px-3 py-2.5">
-              <span className="flex gap-1">
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:120ms]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:240ms]" />
-              </span>
+            <div className="max-w-[80%] rounded-sm border border-white/10 bg-black px-3 py-2">
+              <p className="text-[11px] leading-snug text-white">This is the standard.</p>
             </div>
           </div>
         </div>
 
         {/* Input */}
-        <div className="flex items-center gap-2 border-t border-border bg-card/40 px-3 py-2.5">
-          <div className="flex-1 rounded-full bg-muted px-3 py-1.5 font-mono text-[10.5px] text-muted-foreground">
-            Write a message…
+        <div className="flex items-center gap-2 border-t border-white/5 bg-secondary/10 px-3 py-3">
+          <div className="flex-1 rounded-sm bg-secondary border border-white/5 px-3 py-1.5 font-mono text-[9px] text-muted-foreground uppercase tracking-tighter">
+            Message...
           </div>
           <button
             type="button"
-            aria-hidden="true"
-            tabIndex={-1}
-            className="grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground"
+            className="grid h-8 w-8 place-items-center rounded-sm bg-primary text-black"
           >
             <Send className="h-3.5 w-3.5" />
           </button>
         </div>
-      </div>
-
-      {/* Floating side bubble - top left */}
-      <div className="absolute -left-6 top-16 hidden rounded-xl border border-border bg-background px-3 py-2 shadow-lg sm:block">
-        <p className="text-[10.5px] font-semibold text-foreground">John</p>
-        <p className="font-mono text-[9.5px] text-muted-foreground">Good morning!</p>
-      </div>
-
-      {/* Floating side bubble - bottom right */}
-      <div className="absolute -right-4 bottom-24 hidden rounded-xl border border-border bg-background px-3 py-2 shadow-lg sm:block">
-        <p className="text-[10.5px] font-semibold text-primary">Abel</p>
-        <p className="font-mono text-[9.5px] text-muted-foreground">How are you?</p>
       </div>
     </div>
   );
@@ -107,70 +72,65 @@ function TestimonialsIllustration() {
 export function TestimonialsSection() {
   const quotes = [
     {
-      q: "Finally, a chat app that isn't packed with stickers, statuses, and ads. The look is calm, which makes it nice for everyday use.",
+      q: "Dark Chat is the silent standard. Stripped of clutter, engineered for absolute clarity. It's the only tool I trust for deep focus communication.",
       n: "Rara",
-      r: "Student",
+      r: "Tech Lead",
     },
     {
-      q: "I use it to talk with a small team. The moment someone replies, I see it — no jumping between tabs all day.",
+      q: "The zero-latency delivery is unmatched. I see replies the millisecond they're sent. No noise, just pure performance in every session.",
       n: "Bagas",
-      r: "Freelancer",
+      r: "DevOps Engineer",
     },
     {
-      q: "The clean design makes it comfortable to use anytime — not too bright, not too dim. Perfect for all-day conversations.",
+      q: "The high-contrast interface eliminates visual fatigue. It's professional, authentic, and built for those who value their time.",
       n: "Nadia",
-      r: "Writer",
+      r: "Product Designer",
     },
   ];
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-      <SectionLabel index="04" title="What people say" />
-      <h2 className="mt-4 max-w-2xl text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] sm:text-[34px]">
-        Used for everyday chats, not just tried once.
-      </h2>
+      <div className="flex flex-col items-center text-center">
+        <SectionLabel index="04" title="Validation" className="mb-6" />
+        <h2 className="max-w-2xl text-[28px] font-bold leading-tight tracking-[-0.04em] sm:text-[42px] uppercase">
+          Trusted by <span className="text-primary">Elite Teams.</span>
+        </h2>
+        <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-muted-foreground font-medium">
+          See why professionals choose Dark Chat for their most critical and focused conversations.
+        </p>
+      </div>
 
-      <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-center lg:gap-14">
+      <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center lg:gap-14">
         {/* Illustration */}
-        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-blue-50 via-white to-blue-100 px-6 py-12 sm:px-12 sm:py-16">
-          {/* Soft background blobs */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -left-10 -top-10 h-48 w-48 rounded-full bg-primary/10 blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-12 -right-10 h-56 w-56 rounded-full bg-primary/15 blur-3xl"
-          />
-
+        <div className="relative flex items-center justify-center overflow-hidden rounded-sm border border-primary/20 bg-secondary/10 px-6 py-12 sm:px-12 sm:py-16">
           <div className="relative z-10 w-full">
             <TestimonialsIllustration />
           </div>
         </div>
 
         {/* Testimonials list */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           {quotes.map((t) => (
             <figure
               key={t.n}
-              className="group relative rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-background"
+              className="group relative rounded-sm border border-white/5 bg-secondary/20 p-6 transition-all hover:border-primary hover:bg-secondary/40"
             >
               <Quote
                 aria-hidden="true"
-                className="absolute right-4 top-4 h-5 w-5 text-primary/25 transition-colors group-hover:text-primary/50"
+                className="absolute right-6 top-6 h-5 w-5 text-primary/10 transition-colors group-hover:text-primary/30"
               />
-              <blockquote className="pr-8 text-[14.5px] leading-[1.65] text-foreground">
-                {t.q}
+              <blockquote className="pr-10 text-[15px] leading-relaxed text-foreground font-medium">
+                &quot;{t.q}&quot;
               </blockquote>
-              <figcaption className="mt-5 flex items-center gap-3 border-t border-border pt-4">
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-[12.5px] font-semibold tracking-tight text-primary ring-1 ring-primary/20">
+              <figcaption className="mt-6 flex items-center gap-3 border-t border-white/5 pt-5">
+                <span className="grid h-10 w-10 place-items-center rounded-sm bg-primary text-[12px] font-bold text-black uppercase">
                   {t.n[0]}
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-[13.5px] font-medium tracking-tight text-foreground">
+                  <span className="text-[14px] font-bold tracking-tight text-foreground uppercase">
                     {t.n}
                   </span>
-                  <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-muted-foreground">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
                     {t.r}
                   </span>
                 </div>

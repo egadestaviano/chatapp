@@ -21,32 +21,49 @@ export function HowItWorksSection() {
 
   return (
     <section id="how" className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-      <SectionLabel className="w-full justify-center text-center" index="03" title="How it works" />
-      <h2 className="mt-4 mx-auto max-w-2xl text-center text-[28px] font-semibold leading-tight tracking-[-0.02em] sm:text-[34px]">
-        Start chatting in three simple steps.
-      </h2>
-      <p className="mt-3 mx-auto max-w-xl text-center text-[15px] leading-tight text-muted-foreground">
-        Create your account, open a conversation, and enjoy real-time messaging in seconds.
-      </p>
+      <div className="flex gap-12">
+        {/* Vertical Label Sidebar */}
+        <div className="hidden lg:flex flex-col items-center gap-4 pt-2">
+          <div className="w-px h-12 bg-primary/20" />
+          <div className="rotate-90 origin-center whitespace-nowrap">
+            <SectionLabel index="03" title="Workflow" />
+          </div>
+          <div className="w-px flex-1 bg-primary/20" />
+        </div>
 
-      <ol className="mt-10 grid grid-cols-1 gap-y-8 sm:grid-cols-3 sm:gap-x-10">
-        {steps.map((s) => (
-          <li
-            key={s.n}
-            className="flex flex-col gap-3 border-t border-border pt-5"
-          >
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              {s.n}
-            </span>
-            <h3 className="text-[18px] font-semibold tracking-tight text-foreground">
-              {s.t}
-            </h3>
-            <p className="text-[14px] leading-[1.6] text-muted-foreground">
-              {s.d}
-            </p>
-          </li>
-        ))}
-      </ol>
+        <div className="flex-1">
+          <div className="lg:hidden mb-8">
+            <SectionLabel index="03" title="Workflow" />
+          </div>
+          <h2 className="text-[28px] font-bold leading-tight tracking-[-0.04em] sm:text-[42px] uppercase">
+            Absolute <span className="text-primary">Streamline.</span>
+          </h2>
+          <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-muted-foreground font-medium">
+            Dark Chat is built for immediate deployment. Authenticate, connect, and broadcast your message in seconds.
+          </p>
+
+          <ol className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-3">
+            {steps.map((s) => (
+              <li
+                key={s.n}
+                className="flex flex-col gap-5 group"
+              >
+                <div className="w-12 h-12 grid place-items-center bg-primary text-black font-bold font-mono text-lg rounded-sm shadow-[0_0_15px_rgba(0,255,65,0.3)] group-hover:scale-110 transition-transform">
+                  {s.n}
+                </div>
+                <div>
+                  <h3 className="text-[16px] font-bold tracking-tight text-foreground uppercase">
+                    {s.t}
+                  </h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+                    {s.d}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
     </section>
   );
 }

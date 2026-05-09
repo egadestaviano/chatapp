@@ -107,7 +107,7 @@ export function ChatWindow({
 
         <div className="flex items-center gap-2">
           {isGroup && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-primary">
+            <span className="inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-primary">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Active
             </span>
@@ -171,10 +171,10 @@ export function ChatWindow({
 
                 <div className="max-w-[74%]">
                   <div
-                    className={`rounded-xl px-4 py-2.5 text-sm leading-relaxed ${
+                    className={`rounded-sm px-4 py-2.5 text-sm leading-relaxed ${
                       isMe
-                        ? "bg-primary/15 text-foreground ring-1 ring-primary/25"
-                        : "bg-muted/60 text-foreground"
+                        ? "bg-primary text-black font-medium"
+                        : "bg-black text-white border border-white/20"
                     }`}
                   >
                     <p className="break-words">{message.text}</p>

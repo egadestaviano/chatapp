@@ -34,7 +34,7 @@ export function Avatar({ name, picture, size = 40, className = "" }: AvatarProps
 
   return (
     <div
-      className={`rounded-full flex items-center justify-center bg-muted text-foreground border border-border font-semibold shrink-0 overflow-hidden ${className}`}
+      className={`rounded-sm flex items-center justify-center bg-muted text-foreground border border-border font-semibold shrink-0 overflow-hidden ${className}`}
       style={{ width: size, height: size, fontSize: size * 0.4 }}
       aria-label={name ?? "User"}
     >

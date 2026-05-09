@@ -1,52 +1,59 @@
 import { MessageCircle, Users, Bell, Sparkles } from "lucide-react";
 import { SectionLabel } from "@/components/landing/sections/section-label";
+import { cn } from "@/lib/utils";
 
 export function FeaturesSection() {
   const items = [
     {
       icon: MessageCircle,
-      label: "Messages arrive instantly",
-      desc: "The moment you hit send, your message shows up on the other side. No waiting, no refreshing.",
+      label: "Zero-Latency Stream",
+      desc: "Engineered for speed. Messages deliver in real-time with high-precision synchronization across all your devices.",
     },
     {
       icon: Users,
-      label: "See who's around",
-      desc: "Know which friends are active right now, and when they're typing a reply back to you.",
+      label: "Encrypted Identity",
+      desc: "Your presence is protected. Sharp, minimalist status indicators ensure privacy without compromising connectivity.",
     },
     {
       icon: Bell,
-      label: "Tidy group rooms",
-      desc: "Create a space for family, classmates, or a small work team - everything stays in one neat list.",
+      label: "High-Contrast Core",
+      desc: "Optimized for deep focus. A sharp, shadowless design language that eliminates visual noise and digital fatigue.",
     },
     {
       icon: Sparkles,
-      label: "Easy on the eyes",
-      desc: "A clean, simple design with light theme and a layout that puts the conversation first - not ads, not notifications.",
+      label: "Authentic Architecture",
+      desc: "Built for meaningful dialogue. A professional environment stripped of stickers, ads, and engagement-bait.",
     },
   ];
 
   return (
     <section id="features" className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-      <SectionLabel className="w-full justify-center text-center" index="02" title="Features" />
-      <h2 className="mt-4 mx-auto text-center max-w-2xl text-[28px] font-semibold leading-tight tracking-[-0.02em] sm:text-[34px]">
-        Powerful essentials for everyday conversations.
-      </h2>
-      <p className="mt-3 text-center mx-auto text-[15px] leading-tight text-muted-foreground">
-        Built to keep your chats fast and focused, with practical features that help you
-        stay connected without extra clutter.
-      </p>
+      <div className="flex flex-col items-end text-right mb-12">
+        <SectionLabel index="02" title="Features" className="mb-4" />
+        <h2 className="max-w-2xl text-[28px] font-bold leading-tight tracking-[-0.04em] sm:text-[42px] uppercase">
+          Engineered for <span className="text-primary">Elite Clarity.</span>
+        </h2>
+        <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-muted-foreground font-medium">
+          Dark Chat strips away the decorative clutter of modern apps to deliver a messaging experience focused on absolute speed and high-contrast readability.
+        </p>
+      </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2">
-        {items.map(({ icon: Icon, label, desc }) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-primary/10 border border-primary/10">
+        {items.map(({ icon: Icon, label, desc }, idx) => (
           <div
             key={label}
-            className="flex flex-col gap-3 bg-background p-7 transition-colors hover:bg-card"
+            className={cn(
+              "flex flex-col gap-4 bg-background p-8 transition-all hover:bg-secondary/50 group",
+              idx % 2 === 0 ? "pt-12" : "pt-8"
+            )}
           >
-            <Icon className="h-4 w-4 text-primary" strokeWidth={1.75} />
-            <h3 className="text-[16px] font-semibold tracking-tight text-foreground">
+            <div className="w-10 h-10 grid place-items-center bg-secondary border border-white/5 rounded-sm group-hover:border-primary/50 transition-colors">
+              <Icon className="h-5 w-5 text-primary" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-[14px] font-bold tracking-[0.1em] text-foreground uppercase mt-2">
               {label}
             </h3>
-            <p className="text-[14px] leading-[1.6] text-muted-foreground">
+            <p className="text-[13px] leading-relaxed text-muted-foreground">
               {desc}
             </p>
           </div>

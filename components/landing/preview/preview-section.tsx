@@ -9,6 +9,7 @@ import {
   type PreviewMessage,
   type SessionItem,
 } from "@/components/landing/preview/preview-data";
+import { SectionLabel } from "@/components/landing/sections/section-label";
 
 export function PreviewSection() {
   const [sessions, setSessions] = useState<SessionItem[]>(SESSIONS);
@@ -74,7 +75,18 @@ export function PreviewSection() {
   return (
     <section id="preview" className="mx-auto max-w-6xl px-6 py-24">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,660px)_minmax(320px,1fr)] lg:items-center">
-        <div className="w-full max-w-[660px] overflow-hidden rounded-xl border border-border bg-card shadow-sm lg:justify-self-end">
+        <div className="w-full max-w-[660px] overflow-hidden rounded-sm border border-primary/30 bg-card lg:justify-self-end shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)]">
+          {/* Terminal Header */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-primary/20 bg-secondary/30">
+            <div className="flex gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-primary/20" />
+              <div className="w-2.5 h-2.5 rounded-full bg-primary/20" />
+              <div className="w-2.5 h-2.5 rounded-full bg-primary/20" />
+            </div>
+            <div className="font-mono text-[9px] text-primary/40 uppercase tracking-widest">
+              secure_session_v1.0
+            </div>
+          </div>
           <div className="relative grid h-[420px] grid-cols-1 sm:grid-cols-[200px_1fr]">
             {sidebarOpen && (
               <button
@@ -104,19 +116,19 @@ export function PreviewSection() {
           </div>
         </div>
 
-        <div className="lg:pl-2">
-          <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            <span>01</span>
-            <span>Preview</span>
-          </div>
-          <h2 className="mt-4 max-w-xl text-[28px] font-semibold leading-tight tracking-[-0.02em] text-foreground sm:text-[34px]">
-            A familiar chat experience from the first click.
+        <div className="lg:pl-8">
+          <h2 className="text-[28px] font-bold leading-tight tracking-[-0.04em] text-foreground sm:text-[46px] uppercase">
+            Pure <br />
+            <span className="text-primary">Functionality.</span>
           </h2>
-          <p className="mt-3 max-w-lg text-[15px] leading-[1.65] text-muted-foreground">
+          <p className="mt-6 max-w-lg text-[16px] leading-relaxed text-muted-foreground font-medium">
             Designed to feel instantly comfortable, with a clean conversation
             layout, clear message flow, and live typing activity that keeps
             every chat feeling active.
           </p>
+          <div className="mt-8">
+            <SectionLabel index="01" title="Live Preview" />
+          </div>
         </div>
       </div>
     </section>

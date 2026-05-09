@@ -18,13 +18,13 @@ export function PreviewComposer({ value, onChange, onSend }: PreviewComposerProp
               onSend();
             }
           }}
-          className="min-w-0 flex-1 rounded-md border border-border bg-input px-3.5 py-2 text-xs text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+          className="min-w-0 flex-1 rounded-sm border border-white/10 bg-secondary px-3.5 py-2 text-xs text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary"
           placeholder="Type a message..."
         />
         <button
           type="button"
           onClick={onSend}
-          className="flex h-9 w-9 shrink-0 items-center cursor-pointer justify-center rounded-md bg-primary text-primary-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-9 w-9 shrink-0 items-center cursor-pointer justify-center rounded-sm bg-primary text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={!value.trim()}
           aria-label="Send message"
         >

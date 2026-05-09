@@ -63,18 +63,21 @@ export function PreviewSidebar({
             const active = selectedSessionId === session.id;
 
             return (
-              <li key={session.id}>
+              <li key={session.id} className="relative">
                 <button
                   type="button"
                   onClick={() => onSelectSession(session.id)}
-                  className={`w-full px-3 py-2.5 cursor-pointer text-left flex items-center gap-2.5 border-b border-border/30 transition ${
-                    active ? "bg-primary/10 border-primary/30" : "hover:bg-muted/50"
+                  className={`w-full px-3 py-2.5 cursor-pointer text-left flex items-center gap-2.5 border-b border-white/5 transition ${
+                    active ? "bg-secondary" : "hover:bg-secondary/50"
                   }`}
                 >
-                  <div className="relative w-8 h-8 rounded-full flex items-center justify-center bg-muted text-foreground border border-border text-xs font-semibold shrink-0">
+                  {active && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />
+                  )}
+                  <div className="relative w-8 h-8 rounded-sm flex items-center justify-center bg-muted text-foreground border border-white/10 text-xs font-semibold shrink-0">
                     {previewInitials(session.name)}
                     {session.online && (
-                      <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-card bg-emerald-500" />
+                      <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary" />
                     )}
                   </div>
 

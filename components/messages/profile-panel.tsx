@@ -211,22 +211,25 @@ export function ProfilePanel({ userId, isSelf, onClose }: ProfilePanelProps) {
         </div>
       ) : showLogoutConfirm ? (
         <div className="p-6">
-          <h4 className="text-base font-semibold text-foreground">Sign out?</h4>
-          <p className="mt-2 text-sm text-muted-foreground">
-            You&apos;ll need to sign in again to access your messages.
+          <h4 className="text-[14px] font-bold uppercase tracking-[0.15em] text-foreground flex items-center gap-2">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            Session Termination
+          </h4>
+          <p className="mt-4 text-[13px] leading-relaxed text-muted-foreground font-medium">
+            Confirm secure sign-out? You will be required to re-authenticate to access the messaging stream.
           </p>
-          <div className="mt-6 flex justify-end gap-3">
+          <div className="mt-8 grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setShowLogoutConfirm(false)}
-              className="cursor-pointer px-4 py-2 rounded-lg text-sm font-medium border border-border text-foreground hover:bg-muted transition"
+              className="cursor-pointer flex items-center justify-center h-10 border border-white/10 rounded-sm text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleLogout}
-              className="cursor-pointer px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition"
+              className="cursor-pointer flex items-center justify-center h-10 bg-primary rounded-sm text-[11px] font-black uppercase tracking-widest text-black hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               Sign out
             </button>
@@ -238,7 +241,7 @@ export function ProfilePanel({ userId, isSelf, onClose }: ProfilePanelProps) {
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
-          <div className="flex flex-col items-center px-6 py-6 border-b border-border bg-gradient-to-br from-white to-blue-50">
+          <div className="flex flex-col items-center px-6 py-8 border-b border-white/5 bg-secondary/20">
             <div className="relative">
               <div className="w-24 h-24 rounded-full bg-primary/15 ring-4 ring-primary/20 flex items-center justify-center text-3xl font-semibold text-primary overflow-hidden">
                 {previewSrc ? (
@@ -258,7 +261,7 @@ export function ProfilePanel({ userId, isSelf, onClose }: ProfilePanelProps) {
                   <button
                     type="button"
                     onClick={handlePickFile}
-                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary hover:bg-accent text-primary-foreground flex items-center justify-center border-2 border-white shadow cursor-pointer transition"
+                    className="absolute bottom-0 right-0 w-8 h-8 rounded-sm bg-primary hover:opacity-90 text-black flex items-center justify-center border-2 border-background shadow cursor-pointer transition"
                     title="Change photo"
                     aria-label="Change photo"
                   >
@@ -274,7 +277,7 @@ export function ProfilePanel({ userId, isSelf, onClose }: ProfilePanelProps) {
                 </>
               ) : (
                 profile.isOnline && (
-                  <span className="absolute bottom-0.5 right-0.5 w-5 h-5 rounded-full bg-green-500 border-2 border-white" />
+                  <span className="absolute bottom-0.5 right-0.5 w-5 h-5 rounded-sm bg-primary border-2 border-background" />
                 )
               )}
             </div>
@@ -306,12 +309,12 @@ export function ProfilePanel({ userId, isSelf, onClose }: ProfilePanelProps) {
 
           <div className="p-4 space-y-4">
             {error && (
-              <div className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
+              <div className="text-sm text-red-400 bg-red-950/20 border border-red-900/50 px-3 py-2 rounded-sm">
                 {error}
               </div>
             )}
             {success && (
-              <div className="text-sm text-green-700 bg-green-50 border border-green-200 px-3 py-2 rounded-lg flex items-center gap-2">
+              <div className="text-sm text-primary bg-primary/10 border border-primary/20 px-3 py-2 rounded-sm flex items-center gap-2">
                 <Check className="w-4 h-4" /> Profile updated
               </div>
             )}
@@ -334,7 +337,7 @@ export function ProfilePanel({ userId, isSelf, onClose }: ProfilePanelProps) {
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Your name"
                       maxLength={50}
-                      className="w-full pl-9 pr-3 py-2 text-sm bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition text-foreground"
+                      className="w-full pl-9 pr-3 py-2 text-sm bg-secondary border border-white/10 rounded-sm focus:outline-none focus:border-primary transition text-white"
                     />
                   </div>
                 </div>
@@ -358,7 +361,7 @@ export function ProfilePanel({ userId, isSelf, onClose }: ProfilePanelProps) {
                     placeholder="Tell people about yourself..."
                     maxLength={200}
                     rows={3}
-                    className="w-full px-3 py-2 text-sm bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition text-foreground resize-none"
+                    className="w-full px-3 py-2 text-sm bg-secondary border border-white/10 rounded-sm focus:outline-none focus:border-primary transition text-white resize-none"
                   />
                 </div>
 
@@ -426,9 +429,9 @@ export function ProfilePanel({ userId, isSelf, onClose }: ProfilePanelProps) {
                 type="button"
                 onClick={handleSave}
                 disabled={!hasChanges || saving}
-                className="px-4 py-2 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-accent transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="px-5 py-2 rounded-sm text-xs font-bold bg-primary text-black hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {saving ? "Saving..." : "Save changes"}
+                {saving ? "Saving..." : "SAVE CHANGES"}
               </button>
             </div>
           )}

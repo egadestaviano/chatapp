@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 
 const QUICK_ACCOUNTS = [
   { name: "Alice", email: "alice@gmail.com", avatar: "/avatar1.jpg" },
@@ -56,29 +57,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Form */}
         <form
           onSubmit={handleCredentialsLogin}
-          className="bg-white p-8 space-y-6 rounded-2xl shadow-lg border border-border"
+          className="bg-secondary p-8 space-y-6 rounded-sm shadow-2xl border border-primary"
         >
-          <Link href="/" className="flex items-center justify-center gap-1.5">
-            <Image
-              src="/android-chrome-512x512.png"
-              alt="Logo"
-              width={42}
-              height={42}
-              className="rounded-md ring-1 ring-primary/20 shadow-sm"
-              priority
-            />
-            <span className="text-lg font-bold tracking-[-0.01em] leading-none text-foreground">
-              <span className="text-primary">Chat</span>
-              <span className="ml-0.5">App</span>
+          <Link href="/" className="flex items-center justify-center gap-2">
+            <Logo size={48} />
+            <span className="text-xl font-black uppercase tracking-[0.1em] leading-none text-foreground">
+              <span className="text-primary">Dark</span>
+              <span className="ml-1 text-white">Chat</span>
             </span>
           </Link>
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 border border-red-200 px-4 py-3 rounded-lg">
+            <div className="text-sm text-red-400 bg-red-950/20 border border-red-900/50 px-4 py-3 rounded-sm">
               {error}
             </div>
           )}
@@ -97,7 +91,7 @@ export default function LoginPage() {
                 defaultValue="user@gmail.com"
                 required
                 placeholder="Enter your email"
-                className="w-full pl-11 pr-4 py-3 bg-input text-sm text-foreground placeholder-muted-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
               />
             </div>
           </div>
@@ -126,7 +120,7 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 required
                 placeholder="Enter your password"
-                className="w-full pl-11 pr-11 py-3 bg-input text-sm text-foreground placeholder-muted-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
               />
               <button
                 type="button"
@@ -156,9 +150,9 @@ export default function LoginPage() {
           {/* Sign In Button */}
           <button
             type="submit"
-            className="w-full cursor-pointer bg-primary hover:bg-accent text-primary-foreground font-semibold py-3 rounded-lg transition-colors duration-200"
+            className="w-full cursor-pointer bg-primary hover:opacity-90 text-black font-bold uppercase py-3 rounded-sm transition-opacity duration-200"
           >
-            Sign in
+            Sign In
           </button>
         </form>
 
@@ -183,9 +177,9 @@ export default function LoginPage() {
                   onClick={() => handleQuickLogin(acc.email)}
                   disabled={!!quickLoading}
                   title={`Sign in as ${acc.name}`}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-white border border-border hover:border-primary hover:bg-blue-50 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-sm bg-secondary border border-white/5 hover:border-primary transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-semibold text-foreground border border-border">
+                  <div className="relative w-10 h-10 rounded-sm overflow-hidden bg-background flex items-center justify-center text-sm font-semibold text-foreground border border-white/10">
                     {acc.avatar ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img

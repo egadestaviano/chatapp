@@ -422,7 +422,7 @@ export default function ChatApp() {
       <div
         ref={menuRef}
         style={{ width: sidebarCollapsed ? SIDEBAR_COLLAPSED : sidebarWidth }}
-        className={`relative shrink-0 border-r bg-card/90 backdrop-blur-md fixed md:relative top-0 h-full z-50 ease-out md:translate-x-0 md:opacity-100 ${isResizing ? "" : "transition-[transform,opacity,width] duration-300"}
+        className={`relative shrink-0 border-r border-white/5 bg-background fixed md:relative top-0 h-full z-50 ease-out md:translate-x-0 md:opacity-100 ${isResizing ? "" : "transition-[transform,opacity,width] duration-300"}
           ${showMobileMenu
             ? "translate-x-0 opacity-100"
             : "-translate-x-full opacity-0"
@@ -430,12 +430,12 @@ export default function ChatApp() {
         `}
       >
         {showMobileMenu && (
-          <div className="md:hidden flex items-center justify-between px-4 py-3 border-b">
-            <span className="font-semibold text-sm">Messages</span>
+          <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-white/5">
+            <span className="font-bold text-xs uppercase tracking-widest">Messages</span>
 
             <button
               onClick={() => setShowMobileMenu(false)}
-              className="p-2 rounded-md hover:bg-muted"
+              className="p-2 rounded-sm hover:bg-secondary"
               aria-label="Close menu"
             >
               <X />
@@ -463,20 +463,20 @@ export default function ChatApp() {
           className={`hidden md:block absolute top-0 -right-1 h-full w-2 ${sidebarCollapsed ? "" : "cursor-col-resize"} group`}
         >
           <div
-            className={`absolute top-0 left-1/2 -translate-x-1/2 h-full w-px ${sidebarCollapsed ? "" : "group-hover:bg-primary/50"} transition-colors`}
+            className={`absolute top-0 left-1/2 -translate-x-1/2 h-full w-px ${sidebarCollapsed ? "" : "group-hover:bg-primary"} transition-colors`}
           />
           <button
             type="button"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={() => setSidebarCollapsed((v) => !v)}
-            className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 w-5 h-5 rounded-full bg-card border border-border shadow-sm flex items-center justify-center cursor-pointer hover:bg-muted hover:border-primary/40 transition"
+            className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 w-6 h-6 rounded-sm bg-secondary border border-white/10 flex items-center justify-center cursor-pointer hover:border-primary transition"
             aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={sidebarCollapsed ? "Expand" : "Collapse"}
           >
             {sidebarCollapsed ? (
-              <ChevronRight className="w-3 h-3" />
+              <ChevronRight className="w-4 h-4" />
             ) : (
-              <ChevronLeft className="w-3 h-3" />
+              <ChevronLeft className="w-4 h-4" />
             )}
           </button>
         </div>
@@ -496,7 +496,7 @@ export default function ChatApp() {
               onShowProfile={handleShowProfile}
             />
 
-            <div className="p-4 border-t flex gap-3 items-end sticky bottom-0 bg-background/80 backdrop-blur-sm">
+            <div className="p-4 border-t border-white/5 flex gap-3 items-end sticky bottom-0 bg-background/95 backdrop-blur-md">
               <textarea
                 ref={inputRef}
                 value={inputValue}
@@ -522,7 +522,7 @@ export default function ChatApp() {
                     }, 2000);
                   }
                 }}
-                className="flex-1 resize-none border border-border bg-input rounded-lg px-4 py-3 text-sm leading-5 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition max-h-40 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                className="flex-1 resize-none border border-white/10 bg-secondary rounded-sm px-4 py-3 text-sm leading-5 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition max-h-40 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                 placeholder="Type your message..."
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -533,9 +533,10 @@ export default function ChatApp() {
               />
               <button
                 onClick={handleSendMessage}
-                className="bg-primary hover:bg-accent text-primary-foreground px-4 py-3 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-center shrink-0"
+                className="bg-primary hover:opacity-90 text-black px-4 py-3 rounded-sm cursor-pointer transition-opacity duration-200 flex items-center justify-center shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                disabled={!inputValue.trim()}
               >
-                <Send size={18} />
+                <Send size={18} strokeWidth={3} />
               </button>
             </div>
           </>

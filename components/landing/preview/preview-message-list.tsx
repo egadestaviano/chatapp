@@ -36,10 +36,10 @@ export function PreviewMessageList({ messages, session }: PreviewMessageListProp
 
           <div className="max-w-[74%]">
             <div
-              className={`rounded-xl px-3.5 py-2 text-xs leading-relaxed ${
+              className={`rounded-sm px-3.5 py-2 text-xs leading-relaxed ${
                 message.self
-                  ? "bg-primary/15 text-foreground ring-1 ring-primary/25"
-                  : "bg-muted/60 text-foreground"
+                  ? "bg-primary text-black font-medium"
+                  : "bg-black text-white border border-white/20"
               }`}
             >
               <p className="break-words">{message.text}</p>

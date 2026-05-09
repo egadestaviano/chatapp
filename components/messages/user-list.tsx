@@ -82,11 +82,11 @@ export function UserList({
       {!collapsed && (
         <button
           onClick={() => setShowUsers(!showUsers)}
-          className="fixed bottom-6 left-6 z-50 w-14 h-14 rounded-full bg-primary hover:bg-accent text-primary-foreground flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition cursor-pointer duration-200"
+          className="fixed bottom-8 left-8 z-50 w-12 h-12 rounded-sm bg-primary hover:opacity-90 text-black flex items-center justify-center border border-black/10 transition-transform hover:scale-105 active:scale-95 cursor-pointer duration-200"
           aria-label="New Chat"
           title="Start new chat"
         >
-          <Plus size={24} />
+          <Plus size={24} strokeWidth={3} />
         </button>
       )}
 
@@ -99,7 +99,7 @@ export function UserList({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search conversations..."
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-secondary border border-white/5 rounded-sm focus:outline-none focus:border-primary transition"
             />
           </div>
         </div>
@@ -108,7 +108,7 @@ export function UserList({
       {/* USER PICKER MODAL */}
       {showUsers && !collapsed && (
         <div className="fixed w-[100vw] inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="relative w-[min(500px,95vw)] bg-white rounded-2xl shadow-2xl overflow-hidden border border-border">
+          <div className="relative w-[min(500px,95vw)] bg-background rounded-sm shadow-2xl overflow-hidden border border-primary">
             {/* Modal Header */}
             <div className="flex gap-2 items-center justify-between p-4 border-b">
               <div className="relative w-full">
@@ -190,7 +190,7 @@ export function UserList({
                           className={`w-2.5 h-2.5 rounded-full ${user.isOnline ? "bg-green-500" : "bg-muted-foreground"}`}
                         />
                         <button
-                          className="text-sm font-medium cursor-pointer hover:bg-primary/90 bg-primary text-primary-foreground px-3.5 py-1.5 rounded-lg transition"
+                          className="text-sm font-bold cursor-pointer hover:opacity-90 bg-primary text-black px-4 py-1.5 rounded-sm transition"
                           onClick={async (e) => {
                             e.stopPropagation();
                             try {
@@ -245,14 +245,17 @@ export function UserList({
             return (
               <div
                 key={session.id}
-                className={`w-full px-4 py-3 flex items-center gap-3 border-b border-border/30 transition-colors duration-150
+                className={`relative w-full px-4 py-4 flex items-center gap-3 border-b border-white/5 transition-colors duration-150
                   ${
                     active
-                      ? "bg-primary/10 border-border/10"
-                      : "hover:bg-muted/40"
+                      ? "bg-secondary"
+                      : "hover:bg-secondary/40"
                   }
                 `}
               >
+                {active && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />
+                )}
                 {/* Avatar - opens conversation (profile shows in right panel) */}
                 {!session.isGroup && other ? (
                   <button

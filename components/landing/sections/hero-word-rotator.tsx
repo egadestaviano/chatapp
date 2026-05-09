@@ -2,66 +2,47 @@
 
 import { useEffect, useState } from "react";
 
-const WORDS = [
-  { text: "friends" },
-  { text: "family" },
-  { text: "team" },
-];
+const DEFAULT_WORDS = ["Secure", "Fast", "Private", "Authentic", "Secure"];
 
-export function HeroWordRotator() {
-  const [position, setPosition] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(true);
+export function HeroWordRotator({ words = DEFAULT_WORDS }: { words?: string[] }) {
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [currentText, setCurrentText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [speed, setSpeed] = useState(150);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setPosition((prev) => prev + 1);
-    }, 1800);
+    const handleTyping = () => {
+      const fullWord = words[currentWordIndex];
+      
+      if (!isDeleting) {
+        // Typing
+        setCurrentText(fullWord.substring(0, currentText.length + 1));
+        setSpeed(150); // Typing speed
 
-    return () => window.clearInterval(timer);
-  }, []);
+        if (currentText === fullWord) {
+          // Pause at the end of the word
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        // Deleting
+        setCurrentText(fullWord.substring(0, currentText.length - 1));
+        setSpeed(75); // Deleting speed
 
-  useEffect(() => {
-    if (position !== WORDS.length) {
-      return;
-    }
+        if (currentText === "") {
+          setIsDeleting(false);
+          setCurrentWordIndex((prev) => (prev + 1) % words.length);
+        }
+      }
+    };
 
-    const resetTimer = window.setTimeout(() => {
-      setIsTransitioning(false);
-      setPosition(0);
-
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          setIsTransitioning(true);
-        });
-      });
-    }, 500);
-
-    return () => window.clearTimeout(resetTimer);
-  }, [position]);
+    const timer = setTimeout(handleTyping, speed);
+    return () => clearTimeout(timer);
+  }, [currentText, isDeleting, currentWordIndex, words, speed]);
 
   return (
-    <span className="relative inline-block h-[1em]  overflow-hidden whitespace-nowrap align-baseline leading-none -mb-2.5">
-      <span className="invisible block leading-none" aria-hidden="true">
-        friends
-      </span>
-      <span
-        className={[
-          "absolute left-0 top-0 block motion-reduce:transition-none",
-          isTransitioning
-            ? "transition-transform duration-500 ease-out"
-            : "transition-none",
-        ].join(" ")}
-        style={{ transform: `translateY(-${position}em)` }}
-      >
-        {[...WORDS, WORDS[0]].map((word, wordIndex) => (
-          <span
-            key={`${word.text}-${wordIndex}`}
-            className="block h-[1em] whitespace-nowrap leading-none text-foreground"
-          >
-            {word.text}
-          </span>
-        ))}
-      </span>
+    <span className="inline-flex items-center text-primary font-bold min-h-[1em]">
+      {currentText}
+      <span className="ml-1 inline-block w-[2px] h-[0.8em] bg-primary animate-pulse" />
     </span>
   );
 }
