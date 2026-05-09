@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  name         String?
+  picture      String?  @default("https://via.placeholder.com/150")
+  bio          String?
+  authProvider String?  @default("jwt")
+  password     String?
+  providerId   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  isOnline     Boolean @default(false)
+  lastSeen     DateTime?
+
+  messages Message[] @relation("UserMessages")
+}
+
+model Session {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  participantIds String[] // array of ObjectId (string)
+  isGroup        Boolean   @default(false)
+  title          String?
+  lastMessage    String?
+  lastMessageAt  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([lastMessageAt])
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId String
+  senderId  String?
+  text      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  sender User? @relation("UserMessages", fields: [senderId], references: [id])
+
+  @@index([sessionId, createdAt])
+}
