@@ -62,13 +62,13 @@ export default function LoginPage() {
         {/* Form */}
         <form
           onSubmit={handleCredentialsLogin}
-          className="bg-secondary p-8 space-y-6 rounded-sm shadow-2xl border border-primary"
+          className="bg-card p-8 space-y-6 rounded-xl shadow-2xl border border-border/50"
         >
           <Link href="/" className="flex items-center justify-center gap-2">
             <Logo size={48} />
             <span className="text-xl font-black uppercase tracking-[0.1em] leading-none text-foreground">
               <span className="text-primary">Dark</span>
-              <span className="ml-1 text-white">Chat</span>
+              <span className="ml-1 text-foreground">Chat</span>
             </span>
           </Link>
           {error && (
@@ -91,7 +91,7 @@ export default function LoginPage() {
                 defaultValue="user@gmail.com"
                 required
                 placeholder="Enter your email"
-                className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
+                className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-border/50 rounded-md focus:outline-none focus:border-primary transition"
               />
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 required
                 placeholder="Enter your password"
-                className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
+                className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-border/50 rounded-md focus:outline-none focus:border-primary transition"
               />
               <button
                 type="button"
@@ -177,9 +177,9 @@ export default function LoginPage() {
                   onClick={() => handleQuickLogin(acc.email)}
                   disabled={!!quickLoading}
                   title={`Sign in as ${acc.name}`}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-sm bg-secondary border border-white/5 hover:border-primary transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-md bg-secondary border border-border/50 hover:border-primary transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <div className="relative w-10 h-10 rounded-sm overflow-hidden bg-background flex items-center justify-center text-sm font-semibold text-foreground border border-white/10">
+                  <div className="relative w-10 h-10 rounded-md overflow-hidden bg-background flex items-center justify-center text-sm font-semibold text-foreground border border-border/50">
                     {acc.avatar ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -191,7 +191,7 @@ export default function LoginPage() {
                       initial
                     )}
                     {loading && (
-                      <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white">
+                      <span className="absolute inset-0 flex items-center justify-center bg-background/80 text-foreground">
                         <Loader2 className="w-4 h-4 animate-spin" />
                       </span>
                     )}

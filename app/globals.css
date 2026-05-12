@@ -9,32 +9,32 @@ html {
 }
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ffffff;
+  --background: #09090b;
+  --foreground: #fafafa;
 
-  --card: #0a0a0a;
-  --card-foreground: #ffffff;
+  --card: #121214;
+  --card-foreground: #fafafa;
 
-  --popover: #0a0a0a;
-  --popover-foreground: #ffffff;
+  --popover: #121214;
+  --popover-foreground: #fafafa;
 
-  --primary: #00ff41;
-  --primary-foreground: #0a0a0a;
+  --primary: #10b981;
+  --primary-foreground: #022c22;
 
-  --secondary: #1f1f1f;
-  --secondary-foreground: #ffffff;
+  --secondary: #1f1f22;
+  --secondary-foreground: #fafafa;
 
-  --muted: #1f1f1f;
-  --muted-foreground: #a3a3a3;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
 
-  --accent: #00ff41;
-  --accent-foreground: #0a0a0a;
+  --accent: #10b981;
+  --accent-foreground: #022c22;
 
-  --border: #ffffff;
-  --input: #1f1f1f;
+  --border: #27272a;
+  --input: #1f1f22;
 
   --ring: var(--primary);
-  --radius: 4px;
+  --radius: 0.5rem;
 }
 
 @theme inline {

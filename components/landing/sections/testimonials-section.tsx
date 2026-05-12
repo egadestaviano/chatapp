@@ -5,7 +5,7 @@ function TestimonialsIllustration() {
   return (
     <div className="relative mx-auto w-full max-w-[300px]">
       {/* Phone frame */}
-      <div className="relative rounded-sm border border-primary bg-[#0A0A0A] shadow-2xl ring-1 ring-primary/20 overflow-hidden">
+      <div className="relative rounded-2xl border border-border/50 bg-[#09090b] shadow-2xl overflow-hidden">
         {/* Phone notch area */}
         <div className="flex h-4 items-center justify-center bg-primary">
           <div className="h-0.5 w-8 rounded-full bg-black/40" />
@@ -13,7 +13,7 @@ function TestimonialsIllustration() {
 
         {/* Chat header */}
         <div className="flex items-center gap-3 border-b border-white/5 bg-secondary/20 px-4 py-3">
-          <div className="grid h-8 w-8 place-items-center rounded-sm bg-primary text-[11px] font-bold text-black uppercase">
+          <div className="grid h-8 w-8 place-items-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground uppercase">
             E
           </div>
           <div className="flex-1 min-w-0">
@@ -26,27 +26,27 @@ function TestimonialsIllustration() {
         <div className="flex flex-col gap-3 px-4 py-5">
           {/* Other - left */}
           <div className="flex items-end gap-1.5">
-            <div className="grid h-6 w-6 place-items-center rounded-sm bg-secondary border border-white/10 text-[9px] font-bold text-foreground shrink-0 uppercase">
+            <div className="grid h-6 w-6 place-items-center rounded-lg bg-secondary border border-border/50 text-[9px] font-bold text-foreground shrink-0 uppercase">
               E
             </div>
-            <div className="max-w-[80%] rounded-sm border border-white/10 bg-black px-3 py-2">
+            <div className="max-w-[80%] rounded-2xl rounded-bl-sm border border-border/50 bg-card px-3 py-2">
               <p className="text-[11px] leading-snug text-white">The contrast is perfect.</p>
             </div>
           </div>
 
           {/* Me - right */}
           <div className="flex justify-end">
-            <div className="max-w-[80%] rounded-sm bg-primary px-3 py-2">
-              <p className="text-[11px] font-bold leading-snug text-black">Zero distractions. ✨</p>
+            <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2">
+              <p className="text-[11px] font-bold leading-snug text-primary-foreground">Zero distractions. ✨</p>
             </div>
           </div>
 
           {/* Other - left */}
           <div className="flex items-end gap-1.5">
-            <div className="grid h-6 w-6 place-items-center rounded-sm bg-secondary border border-white/10 text-[9px] font-bold text-foreground shrink-0 uppercase">
+            <div className="grid h-6 w-6 place-items-center rounded-lg bg-secondary border border-border/50 text-[9px] font-bold text-foreground shrink-0 uppercase">
               E
             </div>
-            <div className="max-w-[80%] rounded-sm border border-white/10 bg-black px-3 py-2">
+            <div className="max-w-[80%] rounded-2xl rounded-bl-sm border border-border/50 bg-card px-3 py-2">
               <p className="text-[11px] leading-snug text-white">This is the standard.</p>
             </div>
           </div>
@@ -54,12 +54,12 @@ function TestimonialsIllustration() {
 
         {/* Input */}
         <div className="flex items-center gap-2 border-t border-white/5 bg-secondary/10 px-3 py-3">
-          <div className="flex-1 rounded-sm bg-secondary border border-white/5 px-3 py-1.5 font-mono text-[9px] text-muted-foreground uppercase tracking-tighter">
+          <div className="flex-1 rounded-xl bg-secondary border border-border/50 px-3 py-1.5 font-mono text-[9px] text-muted-foreground uppercase tracking-tighter">
             Message...
           </div>
           <button
             type="button"
-            className="grid h-8 w-8 place-items-center rounded-sm bg-primary text-black"
+            className="grid h-8 w-8 place-items-center rounded-xl bg-primary text-primary-foreground cursor-pointer"
           >
             <Send className="h-3.5 w-3.5" />
           </button>
@@ -102,7 +102,7 @@ export function TestimonialsSection() {
 
       <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center lg:gap-14">
         {/* Illustration */}
-        <div className="relative flex items-center justify-center overflow-hidden rounded-sm border border-primary/20 bg-secondary/10 px-6 py-12 sm:px-12 sm:py-16">
+        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-secondary/10 px-6 py-12 sm:px-12 sm:py-16 shadow-xl">
           <div className="relative z-10 w-full">
             <TestimonialsIllustration />
           </div>
@@ -113,7 +113,7 @@ export function TestimonialsSection() {
           {quotes.map((t) => (
             <figure
               key={t.n}
-              className="group relative rounded-sm border border-white/5 bg-secondary/20 p-6 transition-all hover:border-primary hover:bg-secondary/40"
+              className="group relative rounded-2xl border border-border/50 bg-secondary/20 p-6 transition-all hover:border-primary/50 hover:bg-secondary/40 shadow-sm"
             >
               <Quote
                 aria-hidden="true"
@@ -123,7 +123,7 @@ export function TestimonialsSection() {
                 &quot;{t.q}&quot;
               </blockquote>
               <figcaption className="mt-6 flex items-center gap-3 border-t border-white/5 pt-5">
-                <span className="grid h-10 w-10 place-items-center rounded-sm bg-primary text-[12px] font-bold text-black uppercase">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-[12px] font-bold text-primary-foreground uppercase">
                   {t.n[0]}
                 </span>
                 <div className="flex flex-col">

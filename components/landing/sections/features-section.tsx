@@ -38,17 +38,14 @@ export function FeaturesSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-primary/10 border border-primary/10">
-        {items.map(({ icon: Icon, label, desc }, idx) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {items.map(({ icon: Icon, label, desc }) => (
           <div
             key={label}
-            className={cn(
-              "flex flex-col gap-4 bg-background p-8 transition-all hover:bg-secondary/50 group",
-              idx % 2 === 0 ? "pt-12" : "pt-8"
-            )}
+            className="flex flex-col gap-4 bg-card border border-border/50 rounded-2xl p-8 transition-all hover:-translate-y-1 hover:shadow-xl hover:border-primary/50 group"
           >
-            <div className="w-10 h-10 grid place-items-center bg-secondary border border-white/5 rounded-sm group-hover:border-primary/50 transition-colors">
-              <Icon className="h-5 w-5 text-primary" strokeWidth={1.5} />
+            <div className="w-12 h-12 grid place-items-center bg-secondary border border-border/50 rounded-xl group-hover:border-primary/50 transition-colors shadow-sm">
+              <Icon className="h-6 w-6 text-primary" strokeWidth={1.5} />
             </div>
             <h3 className="text-[14px] font-bold tracking-[0.1em] text-foreground uppercase mt-2">
               {label}

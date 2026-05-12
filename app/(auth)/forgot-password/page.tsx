@@ -1,30 +1,23 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { Mail, ArrowLeft } from "lucide-react"
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 
 export default function ForgotPasswordPage() {
   const [emailSent, setEmailSent] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Form */}
-        <div className="bg-white p-8 space-y-6 rounded-2xl shadow-lg border border-border">
-          <Link href="/" className="flex items-center justify-center gap-1.5">
-            <Image
-              src="/android-chrome-512x512.png"
-              alt="Logo"
-              width={42}
-              height={42}
-              className="rounded-md ring-1 ring-primary/20 shadow-sm"
-              priority
-            />
-            <span className="text-lg font-bold tracking-[-0.01em] leading-none text-foreground">
-              <span className="text-primary">Chat</span>
-              <span className="ml-0.5">App</span>
+        <div className="bg-card p-8 space-y-6 rounded-xl shadow-2xl border border-border/50">
+          <Link href="/" className="flex items-center justify-center gap-2">
+            <Logo size={48} />
+            <span className="text-xl font-black uppercase tracking-[0.1em] leading-none text-foreground">
+              <span className="text-primary">Dark</span>
+              <span className="ml-1 text-foreground">Chat</span>
             </span>
           </Link>
 
@@ -41,9 +34,7 @@ export default function ForgotPasswordPage() {
                     id="email"
                     type="email"
                     placeholder="Enter your email"
-                    className="w-full pl-11 pr-4 py-3 bg-input text-sm text-foreground
-                    placeholder-muted-foreground border border-border rounded-lg
-                    focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                    className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-border/50 rounded-md focus:outline-none focus:border-primary transition"
                   />
                 </div>
               </div>
@@ -51,8 +42,7 @@ export default function ForgotPasswordPage() {
               {/* Submit */}
               <button
                 onClick={() => setEmailSent(true)}
-                className="w-full cursor-pointer bg-primary hover:bg-accent
-                text-primary-foreground font-semibold py-3 rounded-lg transition-colors duration-200"
+                className="w-full bg-primary hover:opacity-90 text-primary-foreground font-bold uppercase py-3 rounded-md transition-opacity duration-200 cursor-pointer"
               >
                 Send reset link
               </button>
@@ -65,7 +55,7 @@ export default function ForgotPasswordPage() {
 
               <button
                 onClick={() => setEmailSent(false)}
-                className="inline-flex items-center gap-2 text-primary hover:text-accent text-sm font-medium transition"
+                className="inline-flex items-center gap-2 text-primary hover:text-accent text-sm font-medium transition cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Try again

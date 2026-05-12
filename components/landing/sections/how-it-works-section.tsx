@@ -48,7 +48,7 @@ export function HowItWorksSection() {
                 key={s.n}
                 className="flex flex-col gap-5 group"
               >
-                <div className="w-12 h-12 grid place-items-center bg-primary text-black font-bold font-mono text-lg rounded-sm shadow-[0_0_15px_rgba(0,255,65,0.3)] group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 grid place-items-center bg-primary text-primary-foreground font-bold font-mono text-lg rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] group-hover:-translate-y-1 transition-transform">
                   {s.n}
                 </div>
                 <div>

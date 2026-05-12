@@ -44,12 +44,12 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Form */}
-        <div className="bg-secondary p-8 space-y-6 rounded-sm shadow-2xl border border-primary">
+        <div className="bg-card p-8 space-y-6 rounded-xl shadow-2xl border border-border/50">
           <Link href="/" className="flex items-center justify-center gap-2">
             <Logo size={48} />
             <span className="text-xl font-black uppercase tracking-[0.1em] leading-none text-foreground">
               <span className="text-primary">Dark</span>
-              <span className="ml-1 text-white">Chat</span>
+              <span className="ml-1 text-foreground">Chat</span>
             </span>
           </Link>
 
@@ -73,7 +73,7 @@ export default function RegisterPage() {
                   type="text"
                   required
                   placeholder="Your full name"
-                  className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
+                  className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-border/50 rounded-md focus:outline-none focus:border-primary transition"
                 />
               </div>
             </div>
@@ -91,7 +91,7 @@ export default function RegisterPage() {
                   type="email"
                   required
                   placeholder="Enter your email"
-                  className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
+                  className="w-full pl-11 pr-4 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-border/50 rounded-md focus:outline-none focus:border-primary transition"
                 />
               </div>
             </div>
@@ -109,7 +109,7 @@ export default function RegisterPage() {
                   type={showPassword ? "text" : "password"}
                   required
                   placeholder="At least 8 characters"
-                  className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
+                  className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-border/50 rounded-md focus:outline-none focus:border-primary transition"
                 />
                 <button
                   type="button"
@@ -134,7 +134,7 @@ export default function RegisterPage() {
                   type={showConfirmPassword ? "text" : "password"}
                   required
                   placeholder="Confirm your password"
-                  className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-white/10 rounded-sm focus:outline-none focus:border-primary transition"
+                  className="w-full pl-11 pr-11 py-3 bg-background text-sm text-foreground placeholder-muted-foreground border border-border/50 rounded-md focus:outline-none focus:border-primary transition"
                 />
                 <button
                   type="button"

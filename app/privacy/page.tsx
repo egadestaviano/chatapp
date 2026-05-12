@@ -42,7 +42,7 @@ export default function PrivacyPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
-      <header className="border-b border-white/5 bg-background/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <Logo size={24} />
@@ -194,7 +194,7 @@ export default function PrivacyPage() {
         </div>
       </main>
 
-      <footer className="border-t border-white/5 py-12 bg-secondary/20">
+      <footer className="border-t border-border/50 py-12 bg-secondary/20">
         <div className="mx-auto max-w-4xl px-6 flex justify-between items-center text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
           <span>(c) 2026 Dark Chat</span>
           <Link href="/terms" className="hover:text-primary transition-colors">Terms of Use</Link>

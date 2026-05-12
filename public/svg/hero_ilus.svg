@@ -6,24 +6,24 @@
     </linearGradient>
     
     <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feGaussianBlur stdDeviation="16" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
 
     <linearGradient id="neonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00FF41" />
-      <stop offset="100%" stop-color="#2ECC71" />
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#34d399" />
     </linearGradient>
 
     <filter id="deepShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="30" dy="40" stdDeviation="20" flood-color="#000000" flood-opacity="0.6" />
+      <feDropShadow dx="20" dy="40" stdDeviation="30" flood-color="#000000" flood-opacity="0.5" />
     </filter>
   </defs>
 
   {/* Background Decorative Grid */}
-  <g opacity="0.05">
-    <path d="M0 100H1000M0 200H1000M0 300H1000M0 400H1000M0 500H1000M0 600H1000M0 700H1000" stroke="#00FF41" stroke-width="0.5" />
-    <path d="M100 0V800M200 0V800M300 0V800M400 0V800M500 0V800M600 0V800M700 0V800M800 0V800M900 0V800" stroke="#00FF41" stroke-width="0.5" />
+  <g opacity="0.06">
+    <path d="M0 100H1000M0 200H1000M0 300H1000M0 400H1000M0 500H1000M0 600H1000M0 700H1000" stroke="#10b981" stroke-width="1" stroke-dasharray="4 8" />
+    <path d="M100 0V800M200 0V800M300 0V800M400 0V800M500 0V800M600 0V800M700 0V800M800 0V800M900 0V800" stroke="#10b981" stroke-width="1" stroke-dasharray="4 8" />
   </g>
 
   {/* Isometric Composition (Scaled Up) */}
@@ -31,73 +31,73 @@
     
     {/* Main App Window */}
     <g filter="url(#deepShadow)">
-      <rect x="-250" y="-200" width="500" height="400" rx="4" fill="#0A0A0A" stroke="#00FF41" stroke-width="1.5" stroke-opacity="0.3" />
+      <rect x="-250" y="-200" width="500" height="400" rx="24" fill="#09090b" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.3" />
       
       {/* Sidebar Detail */}
-      <rect x="-250" y="-200" width="120" height="400" fill="#000000" fill-opacity="0.5" />
-      <rect x="-235" y="-170" width="90" height="30" rx="2" fill="#00FF41" fill-opacity="0.05" />
-      <rect x="-235" y="-120" width="90" height="30" rx="2" fill="#FFFFFF" fill-opacity="0.02" />
-      <rect x="-235" y="-70" width="90" height="30" rx="2" fill="#FFFFFF" fill-opacity="0.02" />
+      <rect x="-250" y="-200" width="120" height="400" rx="24" fill="#000000" fill-opacity="0.4" />
+      <rect x="-235" y="-170" width="90" height="30" rx="10" fill="#10b981" fill-opacity="0.08" />
+      <rect x="-235" y="-120" width="90" height="30" rx="10" fill="#FFFFFF" fill-opacity="0.03" />
+      <rect x="-235" y="-70" width="90" height="30" rx="10" fill="#FFFFFF" fill-opacity="0.03" />
     </g>
 
     {/* Message Stream (Multiple Bubbles) */}
     
     {/* Bubble 1 - Far Back (White) */}
-    <g transform="translate(-180, -120)" opacity="0.3">
-      <rect x="-60" y="-20" width="120" height="40" rx="2" fill="url(#glassGradient)" stroke="#FFFFFF" stroke-width="0.5" stroke-opacity="0.2" />
+    <g transform="translate(-180, -120)" opacity="0.4">
+      <rect x="-60" y="-20" width="120" height="40" rx="16" fill="url(#glassGradient)" stroke="#FFFFFF" stroke-width="1" stroke-opacity="0.1" />
     </g>
 
     {/* Bubble 2 - Back (Green) */}
-    <g transform="translate(50, -100)" opacity="0.5">
-      <rect x="-70" y="-25" width="140" height="50" rx="2" fill="url(#neonGradient)" />
+    <g transform="translate(50, -100)" opacity="0.6">
+      <rect x="-70" y="-25" width="140" height="50" rx="16" fill="url(#neonGradient)" />
     </g>
 
     {/* Bubble 3 - Mid (White Glass) */}
     <g transform="translate(-140, 20)" filter="url(#neonGlow)">
-      <rect x="-100" y="-35" width="200" height="70" rx="4" fill="url(#glassGradient)" stroke="#FFFFFF" stroke-width="1" stroke-opacity="0.3" style="backdrop-filter: blur(8px);" />
-      <rect x="-85" y="-15" width="120" height="8" rx="1" fill="#FFFFFF" fill-opacity="0.4" />
-      <rect x="-85" y="5" width="60" height="8" rx="1" fill="#FFFFFF" fill-opacity="0.2" />
+      <rect x="-100" y="-35" width="200" height="70" rx="24" fill="url(#glassGradient)" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.2" style="backdrop-filter: blur(12px);" />
+      <rect x="-85" y="-15" width="120" height="8" rx="4" fill="#FFFFFF" fill-opacity="0.3" />
+      <rect x="-85" y="5" width="60" height="8" rx="4" fill="#FFFFFF" fill-opacity="0.15" />
     </g>
 
     {/* Bubble 4 - Mid (Green Primary) */}
     <g transform="translate(140, -10)" filter="url(#neonGlow)">
-      <rect x="-110" y="-40" width="220" height="80" rx="4" fill="url(#neonGradient)" />
-      <rect x="-90" y="-20" width="140" height="10" rx="1" fill="#0A0A0A" fill-opacity="0.6" />
-      <rect x="-90" y="5" width="90" height="10" rx="1" fill="#0A0A0A" fill-opacity="0.4" />
+      <rect x="-110" y="-40" width="220" height="80" rx="24" fill="url(#neonGradient)" />
+      <rect x="-90" y="-20" width="140" height="10" rx="5" fill="#09090b" fill-opacity="0.7" />
+      <rect x="-90" y="5" width="90" height="10" rx="5" fill="#09090b" fill-opacity="0.5" />
     </g>
 
     {/* Bubble 5 - Front (White Glass) */}
     <g transform="translate(-30, 150)" filter="url(#neonGlow)">
-      <rect x="-120" y="-40" width="240" height="80" rx="4" fill="url(#glassGradient)" stroke="#FFFFFF" stroke-width="1" stroke-opacity="0.4" style="backdrop-filter: blur(12px);" />
-      <rect x="-100" y="-15" width="160" height="10" rx="1" fill="#FFFFFF" fill-opacity="0.5" />
-      <rect x="-100" y="5" width="100" height="10" rx="1" fill="#FFFFFF" fill-opacity="0.2" />
+      <rect x="-120" y="-40" width="240" height="80" rx="28" fill="url(#glassGradient)" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.3" style="backdrop-filter: blur(16px);" />
+      <rect x="-100" y="-15" width="160" height="10" rx="5" fill="#FFFFFF" fill-opacity="0.6" />
+      <rect x="-100" y="5" width="100" height="10" rx="5" fill="#FFFFFF" fill-opacity="0.25" />
     </g>
 
     {/* Bubble 6 - Front Side (Green Small) */}
     <g transform="translate(200, 180)" filter="url(#neonGlow)">
-      <rect x="-60" y="-25" width="120" height="50" rx="4" fill="url(#neonGradient)" />
+      <rect x="-60" y="-25" width="120" height="50" rx="16" fill="url(#neonGradient)" />
     </g>
 
     {/* Connection Data Streams */}
-    <g opacity="0.3">
-      <path d="M-200 -100 Q -50 -50 100 50" stroke="#00FF41" stroke-width="1" stroke-dasharray="10 10" />
-      <path d="M200 -50 Q 50 100 -100 200" stroke="#00FF41" stroke-width="1" stroke-dasharray="10 10" />
+    <g opacity="0.4">
+      <path d="M-200 -100 Q -50 -50 100 50" stroke="#10b981" stroke-width="1.5" stroke-dasharray="8 12" />
+      <path d="M200 -50 Q 50 100 -100 200" stroke="#10b981" stroke-width="1.5" stroke-dasharray="8 12" />
     </g>
 
     {/* Security Nodes */}
-    <circle cx="-220" cy="-170" r="4" fill="#00FF41" filter="url(#neonGlow)" />
-    <circle cx="220" cy="170" r="4" fill="#00FF41" filter="url(#neonGlow)" />
+    <circle cx="-220" cy="-170" r="5" fill="#10b981" filter="url(#neonGlow)" />
+    <circle cx="220" cy="170" r="5" fill="#10b981" filter="url(#neonGlow)" />
   </g>
 
   {/* HUD Overlays */}
-  <g opacity="0.2">
-    <rect x="50" y="50" width="20" height="2" fill="#00FF41" />
-    <rect x="50" y="50" width="2" height="20" fill="#00FF41" />
+  <g opacity="0.3">
+    <rect x="50" y="50" width="30" height="2" rx="1" fill="#10b981" />
+    <rect x="50" y="50" width="2" height="30" rx="1" fill="#10b981" />
     
-    <rect x="930" y="730" width="20" height="2" fill="#00FF41" />
-    <rect x="948" y="712" width="2" height="20" fill="#00FF41" />
+    <rect x="920" y="750" width="30" height="2" rx="1" fill="#10b981" />
+    <rect x="948" y="722" width="2" height="30" rx="1" fill="#10b981" />
   </g>
 
   {/* Scanning Beam */}
-  <rect x="0" y="380" width="1000" height="40" fill="url(#neonGradient)" opacity="0.05" filter="url(#neonGlow)" />
+  <rect x="0" y="380" width="1000" height="60" fill="url(#neonGradient)" opacity="0.04" filter="url(#neonGlow)" />
 </svg>
