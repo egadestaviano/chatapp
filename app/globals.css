@@ -76,6 +76,7 @@ html {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -103,10 +104,38 @@ html {
   will-change: transform, opacity;
 }
 
+@keyframes typing-wave {
+  0%, 60%, 100% { 
+    transform: translateY(0); 
+    opacity: 0.4; 
+  }
+  30% { 
+    transform: translateY(-6px); 
+    opacity: 1; 
+  }
+}
+
+.typing-dot-premium {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--primary);
+  animation: typing-wave 1.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .animate-float {

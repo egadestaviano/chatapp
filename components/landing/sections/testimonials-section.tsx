@@ -3,7 +3,7 @@ import { SectionLabel } from "@/components/landing/sections/section-label";
 
 function TestimonialsIllustration() {
   return (
-    <div className="relative mx-auto w-full max-w-[300px]">
+    <div className="relative mx-auto w-full max-w-[340px]">
       {/* Phone frame */}
       <div className="relative rounded-2xl border border-border/50 bg-[#09090b] shadow-2xl overflow-hidden">
         {/* Phone notch area */}
@@ -48,6 +48,44 @@ function TestimonialsIllustration() {
             </div>
             <div className="max-w-[80%] rounded-2xl rounded-bl-sm border border-border/50 bg-card px-3 py-2">
               <p className="text-[11px] leading-snug text-white">This is the standard.</p>
+            </div>
+          </div>
+
+          {/* Me - right */}
+          <div className="flex justify-end">
+            <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 shadow-lg shadow-primary/20">
+              <p className="text-[11px] font-bold leading-snug text-primary-foreground">Absolute focus.</p>
+            </div>
+          </div>
+
+          {/* Other - left */}
+          <div className="flex items-end gap-1.5">
+            <div className="grid h-6 w-6 place-items-center rounded-lg bg-secondary border border-border/50 text-[9px] font-bold text-foreground shrink-0 uppercase">
+              E
+            </div>
+            <div className="max-w-[80%] rounded-2xl rounded-bl-sm border border-border/50 bg-card px-3 py-2">
+              <p className="text-[11px] leading-snug text-white">The speed is just incredible.</p>
+            </div>
+          </div>
+
+          {/* Me - right */}
+          <div className="flex justify-end">
+            <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 shadow-lg shadow-primary/20">
+              <p className="text-[11px] font-bold leading-snug text-primary-foreground">Built different.</p>
+            </div>
+          </div>
+
+          {/* Typing indicator */}
+          <div className="flex items-end gap-1.5 pt-1">
+            <div className="grid h-6 w-6 place-items-center rounded-lg bg-secondary border border-border/50 text-[9px] font-bold text-foreground shrink-0 uppercase">
+              E
+            </div>
+            <div className="max-w-[80%] rounded-2xl rounded-bl-sm border border-border/50 bg-card px-4 py-3 shadow-inner">
+              <div className="flex gap-1">
+                <div className="typing-dot-premium" style={{ animationDelay: "0s" }} />
+                <div className="typing-dot-premium" style={{ animationDelay: "0.15s" }} />
+                <div className="typing-dot-premium" style={{ animationDelay: "0.3s" }} />
+              </div>
             </div>
           </div>
         </div>
@@ -100,9 +138,13 @@ export function TestimonialsSection() {
         </p>
       </div>
 
-      <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center lg:gap-14">
+      <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
         {/* Illustration */}
-        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-secondary/10 px-6 py-12 sm:px-12 sm:py-16 shadow-xl">
+        <div className="relative flex items-center justify-center overflow-hidden rounded-3xl rounded-bl-none border border-primary/20 bg-secondary/5 p-8 sm:p-12 shadow-2xl shadow-primary/5">
+          {/* Subtle green glow */}
+          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-primary/20 blur-[100px]" />
+          <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-primary/10 blur-[100px]" />
+
           <div className="relative z-10 w-full">
             <TestimonialsIllustration />
           </div>
@@ -113,17 +155,19 @@ export function TestimonialsSection() {
           {quotes.map((t) => (
             <figure
               key={t.n}
-              className="group relative rounded-2xl border border-border/50 bg-secondary/20 p-6 transition-all hover:border-primary/50 hover:bg-secondary/40 shadow-sm"
+              className="group relative flex flex-1 flex-col overflow-hidden rounded-3xl rounded-br-none border border-border/50 bg-secondary/20 p-6 transition-all hover:border-primary/60 hover:bg-secondary/30 shadow-sm hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]"
             >
+              {/* Corner accent */}
+              <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl transition-all group-hover:bg-primary/30" />
               <Quote
                 aria-hidden="true"
                 className="absolute right-6 top-6 h-5 w-5 text-primary/10 transition-colors group-hover:text-primary/30"
               />
-              <blockquote className="pr-10 text-[15px] leading-relaxed text-foreground font-medium">
+              <blockquote className="flex-1 pr-10 text-[15px] leading-relaxed text-foreground font-medium">
                 &quot;{t.q}&quot;
               </blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 border-t border-white/5 pt-5">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-[12px] font-bold text-primary-foreground uppercase">
+              <figcaption className="mt-auto flex items-center gap-3 border-t border-white/5 pt-5">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-[12px] font-bold text-primary-foreground uppercase shadow-[0_0_20px_rgba(16,185,129,0.4)]">
                   {t.n[0]}
                 </span>
                 <div className="flex flex-col">
