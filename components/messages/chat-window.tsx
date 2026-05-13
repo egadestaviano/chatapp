@@ -1,9 +1,12 @@
 "use client"
 
-import { Hand, Users } from "lucide-react"
-import { useEffect, useRef } from "react"
+import { Hand, PanelRightClose, PanelRightOpen, Users } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import { useMyProfile } from "./my-profile-context"
 import { Avatar } from "./avatar"
+import { TranslateButton, type TranslateResult } from "./translate-button"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 interface Message {
   id: string
@@ -34,6 +37,8 @@ interface ChatWindowProps {
   typingUsers: string[]
   users: Participant[]
   onShowProfile: (userId: string) => void
+  panelOpen?: boolean
+  onTogglePanel?: () => void
 }
 
 export function ChatWindow({
@@ -44,7 +49,10 @@ export function ChatWindow({
   typingUsers,
   users,
   onShowProfile,
+  panelOpen,
+  onTogglePanel,
 }: ChatWindowProps) {
+  const [translations, setTranslations] = useState<Record<string, TranslateResult | null>>({})
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { profile: myProfile } = useMyProfile()
 
@@ -77,8 +85,8 @@ export function ChatWindow({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="px-4 md:px-6 py-4 border-b border-border bg-background flex items-center justify-between">
-        <div className="max-sm:ml-14 flex items-center gap-3 min-w-0">
+      <div className="px-4 md:px-6 py-4 border-b border-border/50 bg-background flex items-center justify-between gap-2">
+        <div className="max-sm:ml-14 flex items-center gap-3 min-w-0 flex-1">
           {!isGroup && otherUser ? (
             <button
               type="button"
@@ -98,16 +106,16 @@ export function ChatWindow({
               <h2 className="text-[22px] font-semibold leading-none tracking-tight text-foreground truncate">
                 {title}
               </h2>
-              <p className="font-mono text-[11px] text-muted-foreground">
-                {isGroup ? "4 people online" : online ? "Active now" : "Offline"}
+              <p className="font-mono text-[11px] text-muted-foreground mt-1">
+                {isGroup ? "Active" : online ? "Active now" : "Offline"}
               </p>
             </div>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {isGroup && (
-            <span className="inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-primary">
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-primary">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Active
             </span>
@@ -123,6 +131,22 @@ export function ChatWindow({
               {myName || "You"}
             </span>
           </button>
+          {onTogglePanel && (
+            <button
+              type="button"
+              onClick={onTogglePanel}
+              aria-pressed={panelOpen}
+              aria-label={panelOpen ? "Hide details panel" : "Show details panel"}
+              title={panelOpen ? "Hide details panel" : "Show details panel"}
+              className={`cursor-pointer p-2 rounded-md border transition ${
+                panelOpen
+                  ? "bg-primary/10 border-primary/30 text-primary"
+                  : "bg-transparent border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              {panelOpen ? <PanelRightClose  className="w-4 h-4" strokeWidth={1.75} /> : <PanelRightOpen  className="w-4 h-4" strokeWidth={1.75} />}
+            </button>
+          )}
         </div>
       </div>
 
@@ -139,52 +163,81 @@ export function ChatWindow({
             </div>
           </div>
         ) : (
-          messages.map((message) => {
+          messages.map((message, idx) => {
             const isMe = message.senderId === currentUserId
+            const sender = !isMe
+              ? session.participants?.find((p) => p.id === message.senderId)
+              : null
+            const prev = idx > 0 ? messages[idx - 1] : null
+            const sameSenderAsPrev =
+              prev && prev.senderId === message.senderId && !isMe
 
             return (
               <div
                 key={message.id}
-                className={`flex items-end gap-2.5 ${isMe ? "justify-end" : "justify-start"}`}
+                className={`flex items-end gap-2.5 ${isMe ? "justify-end" : "justify-start"} ${sameSenderAsPrev ? "mt-1" : ""}`}
               >
                 {!isMe && (
-                  isGroup ? (
+                  sender ? (
+                    sameSenderAsPrev ? (
+                      <div className="w-8 shrink-0" aria-hidden="true" />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onShowProfile(sender.id)}
+                        className="rounded-full shrink-0 cursor-pointer hover:ring-2 hover:ring-primary/40 transition"
+                        title={`View ${sender.name ?? "profile"}`}
+                        aria-label="View profile"
+                      >
+                        <Avatar
+                          name={sender.name}
+                          picture={sender.picture}
+                          size={32}
+                        />
+                      </button>
+                    )
+                  ) : (
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0 border border-border">
                       <Users className="w-3.5 h-3.5" strokeWidth={1.75} />
                     </div>
-                  ) : otherUser ? (
-                    <button
-                      type="button"
-                      onClick={() => onShowProfile(otherUser.id)}
-                      className="rounded-full shrink-0 cursor-pointer hover:ring-2 hover:ring-primary/40 transition"
-                      title="View profile"
-                      aria-label="View profile"
-                    >
-                      <Avatar
-                        name={otherUser.name}
-                        picture={otherUser.picture}
-                        size={32}
-                      />
-                    </button>
-                  ) : null
+                  )
                 )}
 
-                <div className="max-w-[74%]">
+                <div className="max-w-[78%] sm:max-w-[74%] min-w-0">
+                  {isGroup && !isMe && sender && !sameSenderAsPrev && (
+                    <p className="text-[11px] font-semibold text-foreground/70 mb-0.5 ml-1">
+                      {sender.name ?? "Unknown"}
+                    </p>
+                  )}
                   <div
-                    className={`rounded-sm px-4 py-2.5 text-sm leading-relaxed ${
+                    className={`rounded-xl px-4 py-2.5 text-sm leading-relaxed wrap-break-word overflow-hidden ${
                       isMe
-                        ? "bg-primary text-black font-medium"
-                        : "bg-black text-white border border-white/20"
+                        ? "bg-primary/15 text-foreground ring-1 ring-primary/25"
+                        : "bg-muted/60 text-foreground"
                     }`}
                   >
-                    <p className="break-words">{message.text}</p>
+                    <div className="prose prose-invert prose-emerald prose-sm max-w-none break-words">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {translations[message.id]?.translatedText ?? message.text}
+                      </ReactMarkdown>
+                    </div>
                   </div>
+
+                  {!isMe && (
+                    <TranslateButton
+                      text={message.text}
+                      cached={translations[message.id]}
+                      onCache={(res) =>
+                        setTranslations((prev) => ({ ...prev, [message.id]: res }))
+                      }
+                    />
+                  )}
                   <p
-                    className={`mt-1 font-mono text-[11px] ${
-                      isMe ? "text-right text-muted-foreground" : "text-muted-foreground"
+                    className={`mt-1 font-mono text-[11px] text-muted-foreground ${
+                      isMe ? "text-right" : "text-left"
                     }`}
                   >
-                    {isMe ? "you - " : ""}
+                    {isMe ? "you · " : ""}
                     {new Date(message.createdAt).toLocaleTimeString("id-ID", {
                       hour: "2-digit",
                       minute: "2-digit",

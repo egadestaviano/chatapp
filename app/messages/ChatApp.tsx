@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { UserList } from "@/components/messages/user-list";
 import { ChatWindow } from "@/components/messages/chat-window";
 import { ProfilePanel } from "@/components/messages/profile-panel";
+import { NewChatModal } from "@/components/messages/new-chat-modal";
+import { CreateGroupModal } from "@/components/messages/create-group-modal";
+import { GroupInfoPanel } from "@/components/messages/group-info-panel";
 import { MyProfileProvider } from "@/components/messages/my-profile-context";
 import { Send, Menu, X, ChevronLeft, ChevronRight, UserCircle2 } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -36,6 +39,7 @@ export default function ChatApp() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const selectedSession = sessions.find((s) => s.id === selectedSessionId);
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
   const [inputValue, setInputValue] = useState("");
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -45,11 +49,19 @@ export default function ChatApp() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [showProfilePanel, setShowProfilePanel] = useState(true);
+  const [showGroupInfoPanel, setShowGroupInfoPanel] = useState(true);
   const [panelUserId, setPanelUserId] = useState<string | null>(null);
+  const [profilePanelWidth, setProfilePanelWidth] = useState(300);
+  const [isResizingProfile, setIsResizingProfile] = useState(false);
+
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
 
   const SIDEBAR_MIN = 220;
   const SIDEBAR_MAX = 480;
   const SIDEBAR_COLLAPSED = 72;
+  const PROFILE_PANEL_MIN = 260;
+  const PROFILE_PANEL_MAX = 480;
 
   useEffect(() => {
     const w = Number(localStorage.getItem("sidebarWidth"));
@@ -60,7 +72,17 @@ export default function ChatApp() {
 
   useEffect(() => {
     localStorage.setItem("profilePanelHidden", showProfilePanel ? "0" : "1");
-  }, [showProfilePanel]);
+    localStorage.setItem("groupInfoPanelHidden", showGroupInfoPanel ? "0" : "1");
+  }, [showProfilePanel, showGroupInfoPanel]);
+
+  useEffect(() => {
+    const pw = Number(localStorage.getItem("profilePanelWidth"));
+    if (pw) setProfilePanelWidth(Math.min(PROFILE_PANEL_MAX, Math.max(PROFILE_PANEL_MIN, pw)));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("profilePanelWidth", String(profilePanelWidth));
+  }, [profilePanelWidth]);
 
   useEffect(() => {
     if (!selectedSessionId) {
@@ -103,6 +125,30 @@ export default function ChatApp() {
     };
     const onUp = () => {
       setIsResizing(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
+
+  const startProfileResize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingProfile(true);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    const onMove = (ev: MouseEvent) => {
+      const next = Math.min(
+        PROFILE_PANEL_MAX,
+        Math.max(PROFILE_PANEL_MIN, window.innerWidth - ev.clientX)
+      );
+      setProfilePanelWidth(next);
+    };
+    const onUp = () => {
+      setIsResizingProfile(false);
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
       window.removeEventListener("mousemove", onMove);
@@ -378,6 +424,65 @@ export default function ChatApp() {
     return enriched;
   };
 
+  const handleStartChat = async (userId: string) => {
+    await startChat(userId);
+    setShowNewChat(false);
+  };
+
+  const handleJoinGroup = async (sessionId: string) => {
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/join`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setSelectedSessionId(sessionId);
+        await fetchSessions();
+      }
+    } catch (err) {
+      console.error("Join group error", err);
+    }
+    setShowNewChat(false);
+  };
+
+  const handleCreateGroup = async (title: string, userIds: string[]) => {
+    try {
+      const res = await fetch("/api/sessions", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, isGroup: true, participantIds: userIds }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSelectedSessionId(data.id);
+        await fetchSessions();
+      }
+    } catch (err) {
+      console.error("Create group error", err);
+    }
+    setShowCreateGroup(false);
+  };
+
+  const handleUpdateGroup = async (
+    sessionId: string,
+    patch: { title?: string; addUserIds?: string[]; removeUserIds?: string[] }
+  ) => {
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+      if (res.ok) {
+        await fetchSessions();
+      }
+    } catch (err) {
+      console.error("Update group error", err);
+    }
+  };
+
   /**
    * SEND MESSAGE
    */
@@ -419,19 +524,27 @@ export default function ChatApp() {
         {showMobileMenu ? <X /> : <Menu />}
       </button>
 
+      {showMobileMenu && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+          onClick={() => setShowMobileMenu(false)}
+          aria-hidden="true"
+        />
+      )}
+
       <div
         ref={menuRef}
         style={{ width: sidebarCollapsed ? SIDEBAR_COLLAPSED : sidebarWidth }}
-        className={`relative shrink-0 border-r border-border/50 bg-card fixed md:relative top-0 h-full z-50 ease-out md:translate-x-0 md:opacity-100 ${isResizing ? "" : "transition-[transform,opacity,width] duration-300"}
+        className={`shrink-0 border-r border-border/50 bg-card/90 backdrop-blur-md max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:max-w-[85vw] md:relative md:translate-x-0 md:opacity-100 ${isResizing ? "" : "transition-[transform,opacity,width] duration-300"}
           ${showMobileMenu
-            ? "translate-x-0 opacity-100"
-            : "-translate-x-full opacity-0"
+            ? "max-md:translate-x-0 max-md:opacity-100"
+            : "max-md:-translate-x-full max-md:opacity-0"
           }
         `}
       >
         {showMobileMenu && (
           <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-border/50">
-            <span className="font-bold text-xs uppercase tracking-widest">Messages</span>
+            <span className="font-semibold text-sm">Messages</span>
 
             <button
               onClick={() => setShowMobileMenu(false)}
@@ -452,6 +565,7 @@ export default function ChatApp() {
           }}
           currentUserId={session?.user?.id}
           collapsed={sidebarCollapsed}
+          onOpenNewChat={() => setShowNewChat(true)}
           onStartChat={async (userId) => {
             await startChat(userId);
             setShowMobileMenu(false);
@@ -463,26 +577,26 @@ export default function ChatApp() {
           className={`hidden md:block absolute top-0 -right-1 h-full w-2 ${sidebarCollapsed ? "" : "cursor-col-resize"} group`}
         >
           <div
-            className={`absolute top-0 left-1/2 -translate-x-1/2 h-full w-px ${sidebarCollapsed ? "" : "group-hover:bg-primary"} transition-colors`}
+            className={`absolute top-0 left-1/2 -translate-x-1/2 h-full w-px ${sidebarCollapsed ? "" : "group-hover:bg-primary/50"} transition-colors`}
           />
           <button
             type="button"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={() => setSidebarCollapsed((v) => !v)}
-            className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 w-6 h-6 rounded-md bg-secondary border border-border/50 flex items-center justify-center cursor-pointer hover:border-primary transition"
+            className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 w-5 h-5 rounded-full bg-card border border-border shadow-sm flex items-center justify-center cursor-pointer hover:bg-muted hover:border-primary/40 transition"
             aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={sidebarCollapsed ? "Expand" : "Collapse"}
           >
             {sidebarCollapsed ? (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3 h-3" />
             ) : (
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3 h-3" />
             )}
           </button>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col">
 
         {selectedSessionId ? (
           <>
@@ -494,50 +608,57 @@ export default function ChatApp() {
               typingUsers={Array.from(typingUsers)}
               users={users}
               onShowProfile={handleShowProfile}
+              panelOpen={selectedSession?.isGroup ? showGroupInfoPanel : showProfilePanel}
+              onTogglePanel={() => {
+                if (selectedSession?.isGroup) setShowGroupInfoPanel((v) => !v);
+                else setShowProfilePanel((v) => !v);
+              }}
             />
 
-            <div className="p-4 border-t border-border/50 flex gap-3 items-end sticky bottom-0 bg-background/95 backdrop-blur-md">
-              <textarea
-                ref={inputRef}
-                value={inputValue}
-                rows={1}
-                onChange={(e) => setInputValue(e.target.value)}
-                onInput={() => {
-                  if (wsRef.current?.readyState === WebSocket.OPEN && selectedSessionId) {
-                    wsRef.current.send(JSON.stringify({
-                      type: "typing",
-                      sessionId: selectedSessionId,
-                      userId: session?.user?.id,
-                    }));
-                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            <div className="border-t border-border/50 sticky bottom-0 bg-background/80 backdrop-blur-md">
+              <div className="p-4 flex gap-3 items-end">
+                <textarea
+                  ref={inputRef}
+                  value={inputValue}
+                  rows={1}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onInput={() => {
+                    if (wsRef.current?.readyState === WebSocket.OPEN && selectedSessionId) {
+                      wsRef.current.send(JSON.stringify({
+                        type: "typing",
+                        sessionId: selectedSessionId,
+                        userId: session?.user?.id,
+                      }));
+                      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
-                    typingTimeoutRef.current = window.setTimeout(() => {
-                      if (wsRef.current?.readyState === WebSocket.OPEN && selectedSessionId) {
-                        wsRef.current.send(JSON.stringify({
-                          type: "stop-typing",
-                          sessionId: selectedSessionId,
-                          userId: session?.user?.id,
-                        }));
-                      }
-                    }, 2000);
-                  }
-                }}
-                className="flex-1 resize-none border border-border/50 bg-secondary rounded-md px-4 py-3 text-sm leading-5 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition max-h-40 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-                placeholder="Type your message..."
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }}
-              />
-              <button
-                onClick={handleSendMessage}
-                className="bg-primary hover:opacity-90 text-black px-4 py-3 rounded-sm cursor-pointer transition-opacity duration-200 flex items-center justify-center shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
-                disabled={!inputValue.trim()}
-              >
-                <Send size={18} strokeWidth={3} />
-              </button>
+                      typingTimeoutRef.current = window.setTimeout(() => {
+                        if (wsRef.current?.readyState === WebSocket.OPEN && selectedSessionId) {
+                          wsRef.current.send(JSON.stringify({
+                            type: "stop-typing",
+                            sessionId: selectedSessionId,
+                            userId: session?.user?.id,
+                          }));
+                        }
+                      }, 2000);
+                    }
+                  }}
+                  className="flex-1 resize-none border border-border/50 bg-secondary rounded-lg px-4 py-3 text-sm leading-5 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition max-h-40 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                  placeholder="Type your message..."
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  className="bg-primary hover:opacity-90 text-black px-4 py-3 rounded-lg cursor-pointer transition-opacity duration-200 flex items-center justify-center shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                  disabled={!inputValue.trim()}
+                >
+                  <Send size={18} strokeWidth={3} />
+                </button>
+              </div>
             </div>
           </>
         ) : (
@@ -549,13 +670,65 @@ export default function ChatApp() {
         )}
       </div>
 
-      {showProfilePanel && panelUserId ? (
-        <ProfilePanel
-          userId={panelUserId}
-          isSelf={panelUserId === session?.user?.id}
-          onClose={() => setShowProfilePanel(false)}
-        />
+      {!selectedSession?.isGroup && showProfilePanel && panelUserId ? (
+        <>
+          <div
+            className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+            onClick={() => setShowProfilePanel(false)}
+            aria-hidden="true"
+          />
+          <ProfilePanel
+            userId={panelUserId}
+            isSelf={panelUserId === session?.user?.id}
+            onClose={() => setShowProfilePanel(false)}
+            width={profilePanelWidth}
+            onResizeStart={startProfileResize}
+            isResizing={isResizingProfile}
+          />
+        </>
       ) : null}
+
+      {selectedSession?.isGroup && showGroupInfoPanel ? (
+        <>
+          <div
+            className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+            onClick={() => setShowGroupInfoPanel(false)}
+            aria-hidden="true"
+          />
+          <GroupInfoPanel
+            sessionId={selectedSessionId}
+            session={selectedSession}
+            currentUserId={session?.user?.id}
+            allUsers={users}
+            onClose={() => setShowGroupInfoPanel(false)}
+            onUpdate={handleUpdateGroup}
+            width={profilePanelWidth}
+            onResizeStart={startProfileResize}
+            isResizing={isResizingProfile}
+          />
+        </>
+      ) : null}
+
+      {showNewChat && (
+        <NewChatModal
+          users={users}
+          onClose={() => setShowNewChat(false)}
+          onStartChat={handleStartChat}
+          onJoinGroup={handleJoinGroup}
+          onOpenCreateGroup={() => {
+            setShowNewChat(false);
+            setShowCreateGroup(true);
+          }}
+        />
+      )}
+
+      {showCreateGroup && (
+        <CreateGroupModal
+          users={users}
+          onClose={() => setShowCreateGroup(false)}
+          onCreate={handleCreateGroup}
+        />
+      )}
     </div>
     </MyProfileProvider>
   );
