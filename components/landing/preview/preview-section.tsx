@@ -75,9 +75,9 @@ export function PreviewSection() {
   return (
     <section id="preview" className="mx-auto max-w-6xl px-6 py-24">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,660px)_minmax(320px,1fr)] lg:items-center">
-        <div className="w-full max-w-[660px] overflow-hidden rounded-sm border border-primary/30 bg-card lg:justify-self-end shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)]">
+        <div className="w-full max-w-[660px] overflow-hidden rounded-sm border border-primary/30 bg-card lg:justify-self-end shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] ">
           {/* Terminal Header */}
-          <div className="flex items-center justify-between px-4 py-2 border-b border-primary/20 bg-secondary/30">
+          {/* <div className="flex items-center justify-between px-4 py-2 border-b border-primary/20 bg-secondary/30">
             <div className="flex gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-primary/20" />
               <div className="w-2.5 h-2.5 rounded-full bg-primary/20" />
@@ -86,7 +86,7 @@ export function PreviewSection() {
             <div className="font-mono text-[9px] text-primary/40 uppercase tracking-widest">
               secure_session_v1.0
             </div>
-          </div>
+          </div> */}
           <div className="relative grid h-[420px] grid-cols-1 sm:grid-cols-[200px_1fr]">
             {sidebarOpen && (
               <button

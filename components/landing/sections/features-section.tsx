@@ -28,12 +28,12 @@ export function FeaturesSection() {
 
   return (
     <section id="features" className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-      <div className="flex flex-col items-end text-right mb-12">
+      <div className="flex flex-col items-center text-right mb-12">
         <SectionLabel index="02" title="Features" className="mb-4" />
         <h2 className="max-w-2xl text-[28px] font-bold leading-tight tracking-[-0.04em] sm:text-[42px] uppercase">
           Engineered for <span className="text-primary">Elite Clarity.</span>
         </h2>
-        <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-muted-foreground font-medium">
+        <p className="mt-4 max-w-xl text-center text-[16px] leading-relaxed text-muted-foreground font-medium">
           Dark Chat strips away the decorative clutter of modern apps to deliver a messaging experience focused on absolute speed and high-contrast readability.
         </p>
       </div>

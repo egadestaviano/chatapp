@@ -21,7 +21,7 @@ export function PreviewMessageList({ messages, session }: PreviewMessageListProp
   return (
     <div
       ref={listRef}
-      className="min-h-0 flex-1 overflow-y-auto px-4 py-3 space-y-3 pb-6 bg-background"
+      className="min-h-0 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-4 py-3 space-y-3 pb-6 "
     >
       {messages.map((message) => (
         <div
