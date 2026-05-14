@@ -28,7 +28,7 @@ export function FeaturesSection() {
 
   return (
     <section id="features" className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-      <div className="flex flex-col items-center text-right mb-12">
+      <div className="flex flex-col items-center text-center mb-12">
         <SectionLabel index="02" title="Features" className="mb-4" />
         <h2 className="max-w-2xl text-[28px] font-bold leading-tight tracking-[-0.04em] sm:text-[42px] uppercase">
           Engineered for <span className="text-primary">Elite Clarity.</span>
