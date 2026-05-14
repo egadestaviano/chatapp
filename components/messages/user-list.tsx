@@ -14,6 +14,7 @@ interface Participant {
 type Session = {
   id: string;
   isGroup?: boolean;
+  isAi?: boolean;
   title?: string | null;
   lastMessage?: string | null;
   lastMessageAt?: string | null;
@@ -67,6 +68,10 @@ export function UserList({
       : sessions;
 
     return [...matched].sort((a, b) => {
+      // AI session always at top
+      if (a.isAi && !b.isAi) return -1;
+      if (!a.isAi && b.isAi) return 1;
+
       const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
       const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
       return bTime - aTime;
@@ -172,17 +177,23 @@ export function UserList({
                       <p className={`font-semibold text-[15px] truncate ${active ? "text-primary" : "text-foreground"}`}>
                         {displayName}
                       </p>
-                      {timeStr && (
-                        <span className="text-[10px] font-mono text-muted-foreground shrink-0">
-                          {timeStr}
+                      {session.isAi ? (
+                        <span className="text-[10px] font-bold text-primary px-1.5 py-0.5 bg-primary/10 rounded tracking-wider leading-none">
+                          AI
                         </span>
+                      ) : (
+                        timeStr && (
+                          <span className="text-[10px] font-mono text-muted-foreground shrink-0">
+                            {timeStr}
+                          </span>
+                        )
                       )}
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-0.5">
                       <p className="text-sm text-muted-foreground truncate">
                         {session.lastMessage || (session.isGroup ? "Group chat" : "No messages yet")}
                       </p>
-                      {!session.isGroup && other?.isOnline && (
+                      {!session.isAi && !session.isGroup && other?.isOnline && (
                         <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                       )}
                     </div>

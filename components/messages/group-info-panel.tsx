@@ -138,7 +138,8 @@ export function GroupInfoPanel({
 
   const handleRemove = async (id: string) => {
     if (id === currentUserId) return;
-    if (members.length <= 2) {
+    if (members.length <= 3) {
+      alert("A group must have at least 3 members.");
       return;
     }
     if (!confirm("Remove this member from the group?")) return;

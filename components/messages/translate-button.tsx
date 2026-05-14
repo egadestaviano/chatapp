@@ -67,7 +67,8 @@ export function TranslateButton({
         body: JSON.stringify({ text, target: code }),
       });
       if (!res.ok) {
-        throw new Error("Translation failed");
+        const msg = await res.text().catch(() => "Translation failed");
+        throw new Error(msg);
       }
       const data = await res.json();
       onCache?.({
@@ -75,9 +76,9 @@ export function TranslateButton({
         detectedSource: data.detectedSource ?? null,
         targetCode: code,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("translate error", err);
-      setError("Translation failed");
+      setError(err.message || "Translation failed");
     } finally {
       setLoading(false);
     }

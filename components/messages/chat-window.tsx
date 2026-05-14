@@ -20,12 +20,14 @@ interface Participant {
   name?: string | null
   picture?: string | null
   isOnline?: boolean
+  isAI?: boolean
 }
 
 interface Session {
   id: string
   title?: string | null
   isGroup?: boolean
+  isAi?: boolean
   participants?: Participant[]
 }
 
@@ -37,6 +39,7 @@ interface ChatWindowProps {
   typingUsers: string[]
   users: Participant[]
   onShowProfile: (userId: string) => void
+  onShowGroupInfo: () => void
   panelOpen?: boolean
   onTogglePanel?: () => void
 }
@@ -49,12 +52,23 @@ export function ChatWindow({
   typingUsers,
   users,
   onShowProfile,
+  onShowGroupInfo,
   panelOpen,
   onTogglePanel,
 }: ChatWindowProps) {
   const [translations, setTranslations] = useState<Record<string, TranslateResult | null>>({})
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { profile: myProfile } = useMyProfile()
+
+  const setTranslationFor = (messageId: string, result: TranslateResult | null) => {
+    setTranslations((prev) => {
+      if (!result) {
+        const { [messageId]: _drop, ...rest } = prev
+        return rest
+      }
+      return { ...prev, [messageId]: result }
+    })
+  }
 
   const myName = myProfile?.name ?? ""
   const myImage = myProfile?.picture ?? ""
@@ -63,6 +77,7 @@ export function ChatWindow({
   if (!session) return null
 
   const isGroup = session.isGroup
+  const isAiChat = session.isAi
 
   const otherUser = !isGroup
     ? session.participants?.find((p) => p.id !== currentUserId)
@@ -72,7 +87,16 @@ export function ChatWindow({
     ? session.title ?? "Group Chat"
     : otherUser?.name ?? "Unknown User"
 
-  const online = !isGroup && users.find((u) => u.id === otherUser?.id)?.isOnline
+  const isUserOnline = (id?: string | null) => {
+    if (!id) return false
+    if (id === currentUserId) return true
+    return !!users.find((u) => u.id === id)?.isOnline
+  }
+
+  const online = !isGroup && isUserOnline(otherUser?.id)
+  const onlineMembersCount = isGroup
+    ? session.participants?.filter((p) => isUserOnline(p.id)).length ?? 0
+    : 0
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -83,22 +107,102 @@ export function ChatWindow({
     .map((userId) => session.participants?.find((p) => p.id === userId)?.name)
     .filter(Boolean)
 
+  const renderMarkdown = (text: string, tone: "default" | "muted" = "default") => {
+    return (
+      <div className={`markdown-body text-sm leading-relaxed ${tone === "muted" ? "text-foreground/90 italic" : ""}`}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            p: ({ children }) => <p className="whitespace-pre-wrap break-words mb-2 last:mb-0">{children}</p>,
+            ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1 last:mb-0">{children}</ul>,
+            ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1 last:mb-0">{children}</ol>,
+            li: ({ children }) => <li className="break-words">{children}</li>,
+            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+            em: ({ children }) => <em className="italic">{children}</em>,
+            code: ({ children, className }) => (
+              <code
+                className={`font-mono text-[0.9em] ${
+                  className?.includes("language-")
+                    ? "block overflow-x-auto rounded-lg bg-black/10 p-3 whitespace-pre-wrap"
+                    : "rounded bg-black/10 px-1.5 py-0.5"
+                }`}
+              >
+                {children}
+              </code>
+            ),
+            pre: ({ children }) => <pre className="mb-2 last:mb-0 overflow-x-auto">{children}</pre>,
+            blockquote: ({ children }) => (
+              <blockquote className="border-l-2 border-primary/40 pl-3 italic text-foreground/90 mb-2 last:mb-0">
+                {children}
+              </blockquote>
+            ),
+          }}
+        >
+          {text}
+        </ReactMarkdown>
+      </div>
+    )
+  }
+
+  const renderMessageText = (message: Message, isMe: boolean, sender?: Participant | null) => {
+    if (!message.text.trim()) {
+      return (
+        <p className="wrap-break-word text-muted-foreground italic">
+          {sender?.isAI || (session.isAi && !isMe) ? "Chattie AI is thinking..." : "Typing..."}
+        </p>
+      )
+    }
+
+    const isMarkdown = sender?.isAI || (session.isAi && !isMe)
+    if (!isMarkdown) {
+      return <p className="wrap-break-word whitespace-pre-wrap">{message.text}</p>
+    }
+
+    return renderMarkdown(message.text)
+  }
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="px-4 md:px-6 py-4 border-b border-border/50 bg-background flex items-center justify-between gap-2">
         <div className="max-sm:ml-14 flex items-center gap-3 min-w-0 flex-1">
           {!isGroup && otherUser ? (
+            isAiChat ? (
+              <div className="min-w-0">
+                <h2 className="text-[22px] font-semibold leading-none tracking-tight text-foreground truncate">
+                  {title}
+                </h2>
+                <p className="font-mono text-[11px] text-muted-foreground mt-1">
+                  Active now
+                </p>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onShowProfile(otherUser.id)}
+                className="group min-w-0 text-left cursor-pointer"
+                title="View profile"
+              >
+                <h2 className="text-[22px] font-semibold leading-none tracking-tight text-foreground truncate group-hover:text-primary transition-colors">
+                  {title}
+                </h2>
+                <p className="font-mono text-[11px] text-muted-foreground mt-1">
+                  {online ? "Active now" : "Offline"}
+                </p>
+              </button>
+            )
+          ) : isGroup ? (
             <button
               type="button"
-              onClick={() => onShowProfile(otherUser.id)}
+              onClick={onShowGroupInfo}
               className="group min-w-0 text-left cursor-pointer"
-              title="View profile"
+              title="View group info"
             >
               <h2 className="text-[22px] font-semibold leading-none tracking-tight text-foreground truncate group-hover:text-primary transition-colors">
                 {title}
               </h2>
               <p className="font-mono text-[11px] text-muted-foreground mt-1">
-                {online ? "Active now" : "Offline"}
+                {session.participants?.length ?? 0} members
+                {onlineMembersCount > 0 ? ` · ${onlineMembersCount} online` : ""}
               </p>
             </button>
           ) : (
@@ -107,7 +211,7 @@ export function ChatWindow({
                 {title}
               </h2>
               <p className="font-mono text-[11px] text-muted-foreground mt-1">
-                {isGroup ? "Active" : online ? "Active now" : "Offline"}
+                {online ? "Active now" : "Offline"}
               </p>
             </div>
           )}
@@ -131,7 +235,7 @@ export function ChatWindow({
               {myName || "You"}
             </span>
           </button>
-          {onTogglePanel && (
+          {onTogglePanel && !isAiChat && (
             <button
               type="button"
               onClick={onTogglePanel}
@@ -181,6 +285,14 @@ export function ChatWindow({
                   sender ? (
                     sameSenderAsPrev ? (
                       <div className="w-8 shrink-0" aria-hidden="true" />
+                    ) : sender.isAI ? (
+                      <div className="rounded-full shrink-0">
+                        <Avatar
+                          name={sender.name}
+                          picture={sender.picture}
+                          size={32}
+                        />
+                      </div>
                     ) : (
                       <button
                         type="button"
@@ -216,33 +328,43 @@ export function ChatWindow({
                         : "bg-muted/60 text-foreground"
                     }`}
                   >
-                    <div className="prose prose-invert prose-emerald prose-sm max-w-none break-words">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {translations[message.id]?.translatedText ?? message.text}
-                      </ReactMarkdown>
-                    </div>
+                    {renderMessageText(message, isMe, sender)}
+                    {translations[message.id] && (
+                      <div
+                        className={`mt-2 pt-2 border-t ${
+                          isMe ? "border-primary/20" : "border-border/60"
+                        }`}
+                      >
+                        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-0.5">
+                          {translations[message.id]?.detectedSource
+                            ? `${translations[message.id]?.detectedSource?.toUpperCase()} → ${translations[message.id]?.targetCode.toUpperCase()}`
+                            : translations[message.id]?.targetCode.toUpperCase()}
+                        </p>
+                        {renderMarkdown(translations[message.id]?.translatedText ?? "", "muted")}
+                      </div>
+                    )}
                   </div>
-
-                  {!isMe && (
-                    <TranslateButton
-                      text={message.text}
-                      cached={translations[message.id]}
-                      onCache={(res) =>
-                        setTranslations((prev) => ({ ...prev, [message.id]: res }))
-                      }
-                    />
-                  )}
-                  <p
-                    className={`mt-1 font-mono text-[11px] text-muted-foreground ${
-                      isMe ? "text-right" : "text-left"
+                  <div
+                    className={`mt-1 flex items-center gap-2 ${
+                      isMe ? "justify-end" : "justify-start"
                     }`}
                   >
-                    {isMe ? "you · " : ""}
-                    {new Date(message.createdAt).toLocaleTimeString("id-ID", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
+                    {!isMe && message.text.trim() && (
+                      <TranslateButton
+                        text={message.text}
+                        align="start"
+                        cached={translations[message.id] ?? null}
+                        onCache={(result) => setTranslationFor(message.id, result)}
+                      />
+                    )}
+                    <span className="font-mono text-[11px] text-muted-foreground">
+                      {isMe ? "you · " : ""}
+                      {new Date(message.createdAt).toLocaleTimeString("id-ID", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
                 </div>
               </div>
             )

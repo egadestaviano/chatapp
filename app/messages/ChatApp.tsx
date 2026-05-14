@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { UserList } from "@/components/messages/user-list";
 import { ChatWindow } from "@/components/messages/chat-window";
 import { ProfilePanel } from "@/components/messages/profile-panel";
@@ -8,7 +8,8 @@ import { NewChatModal } from "@/components/messages/new-chat-modal";
 import { CreateGroupModal } from "@/components/messages/create-group-modal";
 import { GroupInfoPanel } from "@/components/messages/group-info-panel";
 import { MyProfileProvider } from "@/components/messages/my-profile-context";
-import { Send, Menu, X, ChevronLeft, ChevronRight, UserCircle2 } from "lucide-react";
+import { TranslateButton, type TranslateResult } from "@/components/messages/translate-button";
+import { Send, Menu, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 type User = {
@@ -16,6 +17,7 @@ type User = {
   name?: string | null;
   picture?: string | null;
   isOnline?: boolean;
+  isAI?: boolean;
 };
 
 type Message = {
@@ -29,17 +31,55 @@ type Message = {
 type Session = {
   id: string;
   isGroup?: boolean;
+  isAi?: boolean;
   title?: string | null;
   lastMessage?: string | null;
   lastMessageAt?: string | null;
+  participantIds?: string[];
   participants?: User[];
 };
+
+const AI_USER_ID = "ai-assistant";
+const AI_SESSION_ID = "ai-assistant-session";
+const AI_MESSAGES_STORAGE_KEY = "ai-assistant-messages";
+
+function createAiSession(currentUser?: User | null, messages: Message[] = []): Session {
+  const lastMessage = messages.at(-1);
+
+  return {
+    id: AI_SESSION_ID,
+    isAi: true,
+    isGroup: false,
+    title: "Chattie",
+    lastMessage: lastMessage?.text ?? "Chat with AI anytime",
+    lastMessageAt: lastMessage?.createdAt ?? new Date(0).toISOString(),
+    participantIds: [currentUser?.id ?? "me", AI_USER_ID],
+    participants: [
+      ...(currentUser
+        ? [
+            {
+              id: currentUser.id,
+              name: currentUser.name ?? "You",
+              picture: currentUser.picture ?? null,
+              isOnline: true,
+            },
+          ]
+        : []),
+      {
+        id: AI_USER_ID,
+        name: "Chattie AI",
+        picture: '/chattieAi.png',
+        isOnline: true,
+        isAI: true,
+      },
+    ],
+  };
+}
 
 export default function ChatApp() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
-  const selectedSession = sessions.find((s) => s.id === selectedSessionId);
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
   const [inputValue, setInputValue] = useState("");
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -49,13 +89,13 @@ export default function ChatApp() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [showProfilePanel, setShowProfilePanel] = useState(true);
-  const [showGroupInfoPanel, setShowGroupInfoPanel] = useState(true);
   const [panelUserId, setPanelUserId] = useState<string | null>(null);
   const [profilePanelWidth, setProfilePanelWidth] = useState(300);
   const [isResizingProfile, setIsResizingProfile] = useState(false);
-
   const [showNewChat, setShowNewChat] = useState(false);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [aiIsResponding, setAiIsResponding] = useState(false);
+  const [composeTranslation, setComposeTranslation] = useState<TranslateResult | null>(null);
 
   const SIDEBAR_MIN = 220;
   const SIDEBAR_MAX = 480;
@@ -67,37 +107,26 @@ export default function ChatApp() {
     const w = Number(localStorage.getItem("sidebarWidth"));
     if (w) setSidebarWidth(Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, w)));
     if (localStorage.getItem("sidebarCollapsed") === "1") setSidebarCollapsed(true);
-    if (localStorage.getItem("profilePanelHidden") === "1") setShowProfilePanel(false);
+
+    const pw = Number(localStorage.getItem("profilePanelWidth"));
+    if (pw) setProfilePanelWidth(Math.min(PROFILE_PANEL_MAX, Math.max(PROFILE_PANEL_MIN, pw)));
+
+    const stored = localStorage.getItem("profilePanelHidden");
+    if (stored === "1") {
+      setShowProfilePanel(false);
+    } else if (stored === null && typeof window !== "undefined") {
+      // default: hide on mobile, show on desktop
+      setShowProfilePanel(window.matchMedia("(min-width: 768px)").matches);
+    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem("profilePanelHidden", showProfilePanel ? "0" : "1");
-    localStorage.setItem("groupInfoPanelHidden", showGroupInfoPanel ? "0" : "1");
-  }, [showProfilePanel, showGroupInfoPanel]);
-
-  useEffect(() => {
-    const pw = Number(localStorage.getItem("profilePanelWidth"));
-    if (pw) setProfilePanelWidth(Math.min(PROFILE_PANEL_MAX, Math.max(PROFILE_PANEL_MIN, pw)));
-  }, []);
+  }, [showProfilePanel]);
 
   useEffect(() => {
     localStorage.setItem("profilePanelWidth", String(profilePanelWidth));
   }, [profilePanelWidth]);
-
-  useEffect(() => {
-    if (!selectedSessionId) {
-      setPanelUserId(null);
-      return;
-    }
-    const s = sessions.find((x) => x.id === selectedSessionId);
-    if (!s || s.isGroup) {
-      setPanelUserId(null);
-      return;
-    }
-    const otherId =
-      s.participants?.find((p) => p.id !== session?.user?.id)?.id ?? null;
-    setPanelUserId(otherId);
-  }, [selectedSessionId]);
 
   const handleShowProfile = (userId: string) => {
     setPanelUserId(userId);
@@ -166,6 +195,7 @@ export default function ChatApp() {
   const typingTimeoutRef = useRef<number | null>(null);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const aiPendingRequestRef = useRef<string | null>(null);
 
   useEffect(() => {
     const el = inputRef.current;
@@ -174,8 +204,54 @@ export default function ChatApp() {
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
   }, [inputValue]);
 
+  // Drop translation preview when input is cleared or session switches
+  useEffect(() => {
+    if (!inputValue.trim()) setComposeTranslation(null);
+  }, [inputValue]);
+
+  useEffect(() => {
+    setComposeTranslation(null);
+  }, [selectedSessionId]);
+
 
   const { data: session } = useSession();
+  const aiMessages = messages[AI_SESSION_ID] ?? [];
+
+  const aiSession = useMemo(
+    () =>
+      createAiSession(
+        session?.user?.id
+          ? {
+              id: session.user.id,
+              name: session.user.name ?? "You",
+              picture: session.user.image ?? null,
+              isOnline: true,
+            }
+          : null,
+        aiMessages,
+      ),
+    [aiMessages, session?.user?.id, session?.user?.image, session?.user?.name],
+  );
+
+  const allSessions = useMemo(() => {
+    const withoutAi = sessions.filter((item) => item.id !== AI_SESSION_ID);
+    return [aiSession, ...withoutAi];
+  }, [aiSession, sessions]);
+
+  useEffect(() => {
+    if (!selectedSessionId) {
+      setPanelUserId(null);
+      return;
+    }
+    const activeSession = allSessions.find((item) => item.id === selectedSessionId);
+    if (!activeSession || activeSession.isGroup || activeSession.isAi) {
+      setPanelUserId(null);
+      return;
+    }
+    const otherId =
+      activeSession.participants?.find((participant) => participant.id !== session?.user?.id)?.id ?? null;
+    setPanelUserId(otherId);
+  }, [allSessions, selectedSessionId, session?.user?.id]);
 
   /**
    * GET SESSIONS
@@ -187,10 +263,39 @@ export default function ChatApp() {
         setSessions(data);
         if (data.length && !selectedSessionId) {
           setSelectedSessionId(data[0].id);
+        } else if (!data.length && !selectedSessionId) {
+          setSelectedSessionId(AI_SESSION_ID);
         }
       })
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const raw = window.localStorage.getItem(AI_MESSAGES_STORAGE_KEY);
+      if (!raw) return;
+
+      const stored = JSON.parse(raw);
+      if (!Array.isArray(stored)) return;
+
+      setMessages((prev) => ({
+        ...prev,
+        [AI_SESSION_ID]: stored,
+      }));
+    } catch (error) {
+      console.error("Failed to load AI messages", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(
+      AI_MESSAGES_STORAGE_KEY,
+      JSON.stringify(aiMessages),
+    );
+  }, [aiMessages]);
 
   /**
    * GET USERS
@@ -211,7 +316,6 @@ export default function ChatApp() {
 
       const target = e.target as Node;
 
-      // ignore klik hamburger
       if (toggleRef.current?.contains(target)) return;
 
       if (menuRef.current && !menuRef.current.contains(target)) {
@@ -231,6 +335,7 @@ export default function ChatApp() {
    */
   useEffect(() => {
     if (!selectedSessionId) return;
+    if (selectedSessionId === AI_SESSION_ID) return;
 
     fetch(`/api/sessions/${selectedSessionId}/messages`, {
       credentials: "include",
@@ -260,7 +365,6 @@ export default function ChatApp() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log("✅ WS connected");
         setWsAlive(true);
         lastPongRef.current = Date.now();
 
@@ -275,7 +379,6 @@ export default function ChatApp() {
         pingTimerRef.current = window.setInterval(() => {
           if (wsRef.current?.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify({ type: "ping" }));
-            console.log("ping");
 
             if (Date.now() - lastPongRef.current > 60_000) {
               console.warn("⚠️ WS timeout, reconnecting...");
@@ -317,13 +420,64 @@ export default function ChatApp() {
             );
           }
 
+          if (data.type === "ai-start") {
+            setAiIsResponding(true);
+            aiPendingRequestRef.current = data.requestId;
+            return;
+          }
+
+          if (data.type === "ai-chunk") {
+            const requestId = data.requestId as string;
+            const chunk = typeof data.chunk === "string" ? data.chunk : "";
+            if (!requestId || !chunk) return;
+
+            setMessages((prev) => ({
+              ...prev,
+              [AI_SESSION_ID]: (prev[AI_SESSION_ID] ?? []).map((message) =>
+                message.id === requestId
+                  ? { ...message, text: `${message.text}${chunk}` }
+                  : message,
+              ),
+            }));
+            return;
+          }
+
+          if (data.type === "ai-end") {
+            if (aiPendingRequestRef.current === data.requestId) {
+              aiPendingRequestRef.current = null;
+              setAiIsResponding(false);
+            }
+            return;
+          }
+
+          if (data.type === "ai-error") {
+            const requestId = data.requestId as string;
+            const errorText =
+              typeof data.error === "string"
+                ? data.error
+                : "AI sedang belum bisa membalas. Coba lagi sebentar ya.";
+
+            setMessages((prev) => ({
+              ...prev,
+              [AI_SESSION_ID]: (prev[AI_SESSION_ID] ?? []).map((message) =>
+                message.id === requestId
+                  ? { ...message, text: errorText }
+                  : message,
+              ),
+            }));
+
+            if (aiPendingRequestRef.current === requestId) {
+              aiPendingRequestRef.current = null;
+              setAiIsResponding(false);
+            }
+            return;
+          }
+
           if (data.type === "presence") {
-            console.log("👤 presence", data);
             setUsers((prev) => {
               const updated = prev.map((u) =>
                 u.id === data.userId ? { ...u, isOnline: data.online } : u
               );
-              console.log("Updated users:", updated);
               return updated;
             });
             // Update sessions participants
@@ -355,8 +509,9 @@ export default function ChatApp() {
       };
 
       ws.onclose = () => {
-        console.log("WS closed");
         setWsAlive(false);
+        aiPendingRequestRef.current = null;
+        setAiIsResponding(false);
 
         if (reconnectTimerRef.current)
           clearTimeout(reconnectTimerRef.current);
@@ -424,63 +579,83 @@ export default function ChatApp() {
     return enriched;
   };
 
-  const handleStartChat = async (userId: string) => {
-    await startChat(userId);
-    setShowNewChat(false);
-  };
+  /**
+   * CREATE GROUP
+   */
+  const createGroup = async (title: string, userIds: string[]) => {
+    const res = await fetch("/api/sessions", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, isGroup: true, participantIds: userIds }),
+    });
 
-  const handleJoinGroup = async (sessionId: string) => {
-    try {
-      const res = await fetch(`/api/sessions/${sessionId}/join`, {
-        method: "POST",
-        credentials: "include",
-      });
-      if (res.ok) {
-        setSelectedSessionId(sessionId);
-        await fetchSessions();
-      }
-    } catch (err) {
-      console.error("Join group error", err);
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(text || "Failed to create group");
     }
-    setShowNewChat(false);
-  };
 
-  const handleCreateGroup = async (title: string, userIds: string[]) => {
-    try {
-      const res = await fetch("/api/sessions", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, isGroup: true, participantIds: userIds }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSelectedSessionId(data.id);
-        await fetchSessions();
+    const newSession: Session = await res.json();
+
+    setSessions((prev) => {
+      const exists = prev.find((s) => s.id === newSession.id);
+      if (exists) {
+        return prev.map((s) => (s.id === newSession.id ? newSession : s));
       }
-    } catch (err) {
-      console.error("Create group error", err);
-    }
-    setShowCreateGroup(false);
+      return [newSession, ...prev];
+    });
+
+    setSelectedSessionId(newSession.id);
+    setShowMobileMenu(false);
   };
 
-  const handleUpdateGroup = async (
+  /**
+   * JOIN GROUP
+   */
+  const joinGroup = async (sessionId: string) => {
+    const res = await fetch(`/api/sessions/${sessionId}/join`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(text || "Failed to join group");
+    }
+    const joined: Session = await res.json();
+    setSessions((prev) => {
+      const exists = prev.find((s) => s.id === joined.id);
+      if (exists) {
+        return prev.map((s) => (s.id === joined.id ? { ...s, ...joined } : s));
+      }
+      return [joined, ...prev];
+    });
+    setSelectedSessionId(joined.id);
+    setShowMobileMenu(false);
+  };
+
+  /**
+   * UPDATE GROUP
+   */
+  const updateGroup = async (
     sessionId: string,
-    patch: { title?: string; addUserIds?: string[]; removeUserIds?: string[] }
+    patch: { title?: string; addUserIds?: string[]; removeUserIds?: string[] },
   ) => {
-    try {
-      const res = await fetch(`/api/sessions/${sessionId}`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      });
-      if (res.ok) {
-        await fetchSessions();
-      }
-    } catch (err) {
-      console.error("Update group error", err);
+    const res = await fetch(`/api/sessions/${sessionId}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(text || "Failed to update group");
     }
+
+    const updated: Session = await res.json();
+    setSessions((prev) =>
+      prev.map((s) => (s.id === updated.id ? { ...s, ...updated } : s)),
+    );
   };
 
   /**
@@ -488,26 +663,87 @@ export default function ChatApp() {
    */
   const handleSendMessage = async () => {
     if (!inputValue.trim() || !selectedSessionId) return;
+    const trimmed = inputValue.trim();
+
+    if (selectedSessionId === AI_SESSION_ID) {
+      if (!session?.user?.id || aiIsResponding) return;
+      if (wsRef.current?.readyState !== WebSocket.OPEN) {
+        setMessages((prev) => ({
+          ...prev,
+          [AI_SESSION_ID]: [
+            ...(prev[AI_SESSION_ID] ?? []),
+            {
+              id: `ai-local-error-${Date.now()}`,
+              sessionId: AI_SESSION_ID,
+              text: "Koneksi WebSocket belum siap. Coba lagi sebentar ya.",
+              senderId: AI_USER_ID,
+              createdAt: new Date().toISOString(),
+            },
+          ],
+        }));
+        return;
+      }
+
+      const userMessage: Message = {
+        id: `ai-user-${Date.now()}`,
+        sessionId: AI_SESSION_ID,
+        text: trimmed,
+        senderId: session.user.id,
+        createdAt: new Date().toISOString(),
+      };
+
+      const assistantMessageId = `ai-assistant-${Date.now() + 1}`;
+      const assistantPlaceholder: Message = {
+        id: assistantMessageId,
+        sessionId: AI_SESSION_ID,
+        text: "",
+        senderId: AI_USER_ID,
+        createdAt: new Date().toISOString(),
+      };
+
+      const history = [...aiMessages, userMessage];
+
+      setMessages((prev) => ({
+        ...prev,
+        [AI_SESSION_ID]: [...history, assistantPlaceholder],
+      }));
+      setInputValue("");
+      setAiIsResponding(true);
+      aiPendingRequestRef.current = assistantMessageId;
+
+      wsRef.current.send(
+        JSON.stringify({
+          type: "ai-message",
+          requestId: assistantMessageId,
+          messages: history.map((message) => ({
+            role: message.senderId === session.user.id ? "user" : "assistant",
+            content: message.text,
+          })),
+        }),
+      );
+
+      return;
+    }
 
     const payload = {
       type: "message",
       sessionId: selectedSessionId,
-      text: inputValue.trim(),
+      text: trimmed,
       userId: session?.user?.id,
     };
 
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(payload));
     } else {
-      await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: selectedSessionId,
-          text: inputValue.trim(),
-          userId: session?.user?.id,
-        }),
-      });
+        await fetch("/api/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId: selectedSessionId,
+            text: trimmed,
+            userId: session?.user?.id,
+          }),
+        });
     }
 
     setInputValue("");
@@ -556,7 +792,7 @@ export default function ChatApp() {
           </div>
         )}
         <UserList
-          sessions={sessions}
+          sessions={allSessions}
           users={users}
           selectedSessionId={selectedSessionId}
           onSelectSession={(id) => {
@@ -566,10 +802,7 @@ export default function ChatApp() {
           currentUserId={session?.user?.id}
           collapsed={sidebarCollapsed}
           onOpenNewChat={() => setShowNewChat(true)}
-          onStartChat={async (userId) => {
-            await startChat(userId);
-            setShowMobileMenu(false);
-          }}
+          onExpand={() => setSidebarCollapsed(false)}
         />
 
         <div
@@ -603,60 +836,111 @@ export default function ChatApp() {
             <ChatWindow
               sessionId={selectedSessionId}
               messages={messages[selectedSessionId] ?? []}
-              sessions={sessions}
-              currentUserId={session?.user?.id}
+              sessions={allSessions}
+              currentUserId={session?.user?.id ?? ""}
               typingUsers={Array.from(typingUsers)}
               users={users}
               onShowProfile={handleShowProfile}
-              panelOpen={selectedSession?.isGroup ? showGroupInfoPanel : showProfilePanel}
-              onTogglePanel={() => {
-                if (selectedSession?.isGroup) setShowGroupInfoPanel((v) => !v);
-                else setShowProfilePanel((v) => !v);
-              }}
+              onShowGroupInfo={() => setShowProfilePanel(true)}
+              panelOpen={showProfilePanel}
+              onTogglePanel={() => setShowProfilePanel((v) => !v)}
             />
 
             <div className="border-t border-border/50 sticky bottom-0 bg-background/80 backdrop-blur-md">
-              <div className="p-4 flex gap-3 items-end">
-                <textarea
-                  ref={inputRef}
-                  value={inputValue}
-                  rows={1}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onInput={() => {
-                    if (wsRef.current?.readyState === WebSocket.OPEN && selectedSessionId) {
-                      wsRef.current.send(JSON.stringify({
-                        type: "typing",
-                        sessionId: selectedSessionId,
-                        userId: session?.user?.id,
-                      }));
-                      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+              {composeTranslation && (
+                <div className="mx-4 mt-3 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                      {composeTranslation.detectedSource
+                        ? `${composeTranslation.detectedSource.toUpperCase()} → ${composeTranslation.targetCode.toUpperCase()}`
+                        : composeTranslation.targetCode.toUpperCase()}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInputValue(composeTranslation.translatedText);
+                          setComposeTranslation(null);
+                          inputRef.current?.focus();
+                        }}
+                        className="text-[11px] font-semibold text-primary hover:text-primary/80 transition cursor-pointer"
+                      >
+                        Use
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setComposeTranslation(null)}
+                        className="text-muted-foreground hover:text-foreground transition cursor-pointer"
+                        aria-label="Dismiss translation"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-foreground italic wrap-break-word whitespace-pre-wrap">
+                    {composeTranslation.translatedText}
+                  </p>
+                </div>
+              )}
 
-                      typingTimeoutRef.current = window.setTimeout(() => {
-                        if (wsRef.current?.readyState === WebSocket.OPEN && selectedSessionId) {
-                          wsRef.current.send(JSON.stringify({
-                            type: "stop-typing",
-                            sessionId: selectedSessionId,
-                            userId: session?.user?.id,
-                          }));
-                        }
-                      }, 2000);
-                    }
-                  }}
-                  className="flex-1 resize-none border border-border/50 bg-secondary rounded-lg px-4 py-3 text-sm leading-5 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition max-h-40 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-                  placeholder="Type your message..."
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                />
+              <div className="p-4 flex gap-3 items-end">
+                <div className="flex-1 flex flex-col gap-1.5">
+                  {inputValue.trim().length > 0 && (
+                    <div className="px-1">
+                      <TranslateButton
+                        text={inputValue}
+                        align="start"
+                        direction="up"
+                        cached={composeTranslation}
+                        onCache={setComposeTranslation}
+                      />
+                    </div>
+                  )}
+                  <textarea
+                    ref={inputRef}
+                    value={inputValue}
+                    rows={1}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onInput={() => {
+                      if (
+                        selectedSessionId !== AI_SESSION_ID &&
+                        wsRef.current?.readyState === WebSocket.OPEN &&
+                        selectedSessionId
+                      ) {
+                        wsRef.current.send(JSON.stringify({
+                          type: "typing",
+                          sessionId: selectedSessionId,
+                          userId: session?.user?.id,
+                        }));
+                        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+                        typingTimeoutRef.current = window.setTimeout(() => {
+                          if (wsRef.current?.readyState === WebSocket.OPEN && selectedSessionId) {
+                            wsRef.current.send(JSON.stringify({
+                              type: "stop-typing",
+                              sessionId: selectedSessionId,
+                              userId: session?.user?.id,
+                            }));
+                          }
+                        }, 2000);
+                      }
+                    }}
+                    className="resize-none border border-border bg-input rounded-lg px-4 py-3 text-sm leading-5 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition max-h-40 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                    placeholder={selectedSessionId === AI_SESSION_ID ? "Ask Chattie AI anything..." : "Type your message..."}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                  />
+                </div>
                 <button
                   onClick={handleSendMessage}
-                  className="bg-primary hover:opacity-90 text-black px-4 py-3 rounded-lg cursor-pointer transition-opacity duration-200 flex items-center justify-center shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
-                  disabled={!inputValue.trim()}
+                  disabled={selectedSessionId === AI_SESSION_ID && aiIsResponding}
+                  className="bg-primary hover:bg-accent disabled:opacity-60 disabled:cursor-not-allowed text-primary-foreground px-4 py-3 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-center shrink-0"
                 >
-                  <Send size={18} strokeWidth={3} />
+                  <Send size={18} />
                 </button>
               </div>
             </div>
@@ -670,51 +954,69 @@ export default function ChatApp() {
         )}
       </div>
 
-      {!selectedSession?.isGroup && showProfilePanel && panelUserId ? (
-        <>
-          <div
-            className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
-            onClick={() => setShowProfilePanel(false)}
-            aria-hidden="true"
-          />
-          <ProfilePanel
-            userId={panelUserId}
-            isSelf={panelUserId === session?.user?.id}
-            onClose={() => setShowProfilePanel(false)}
-            width={profilePanelWidth}
-            onResizeStart={startProfileResize}
-            isResizing={isResizingProfile}
-          />
-        </>
-      ) : null}
+      {showProfilePanel && (() => {
+        const activeSession = selectedSessionId
+          ? allSessions.find((s) => s.id === selectedSessionId)
+          : undefined;
 
-      {selectedSession?.isGroup && showGroupInfoPanel ? (
-        <>
-          <div
-            className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
-            onClick={() => setShowGroupInfoPanel(false)}
-            aria-hidden="true"
-          />
-          <GroupInfoPanel
-            sessionId={selectedSessionId}
-            session={selectedSession}
-            currentUserId={session?.user?.id}
-            allUsers={users}
-            onClose={() => setShowGroupInfoPanel(false)}
-            onUpdate={handleUpdateGroup}
-            width={profilePanelWidth}
-            onResizeStart={startProfileResize}
-            isResizing={isResizingProfile}
-          />
-        </>
-      ) : null}
+        if (activeSession?.isGroup) {
+          return (
+            <>
+              <div
+                className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+                onClick={() => setShowProfilePanel(false)}
+                aria-hidden="true"
+              />
+              <GroupInfoPanel
+                sessionId={activeSession.id}
+                session={activeSession}
+                currentUserId={session?.user?.id}
+                allUsers={users}
+                onClose={() => setShowProfilePanel(false)}
+                onUpdate={updateGroup}
+                width={profilePanelWidth}
+                onResizeStart={startProfileResize}
+                isResizing={isResizingProfile}
+              />
+            </>
+          );
+        }
+
+        if (panelUserId) {
+          return (
+            <>
+              <div
+                className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+                onClick={() => setShowProfilePanel(false)}
+                aria-hidden="true"
+              />
+              <ProfilePanel
+                userId={panelUserId}
+                isSelf={panelUserId === session?.user?.id}
+                onClose={() => setShowProfilePanel(false)}
+                width={profilePanelWidth}
+                onResizeStart={startProfileResize}
+                isResizing={isResizingProfile}
+              />
+            </>
+          );
+        }
+
+        return null;
+      })()}
 
       {showNewChat && (
         <NewChatModal
           users={users}
           onClose={() => setShowNewChat(false)}
-          onStartChat={handleStartChat}
-          onJoinGroup={handleJoinGroup}
+          onStartChat={async (userId) => {
+            await startChat(userId);
+            setShowNewChat(false);
+          }}
+          onJoinGroup={async (groupId) => {
+            await joinGroup(groupId);
+            setShowNewChat(false);
+          }}
           onOpenCreateGroup={() => {
             setShowNewChat(false);
             setShowCreateGroup(true);
@@ -726,7 +1028,10 @@ export default function ChatApp() {
         <CreateGroupModal
           users={users}
           onClose={() => setShowCreateGroup(false)}
-          onCreate={handleCreateGroup}
+          onCreate={async (title, userIds) => {
+            await createGroup(title, userIds);
+            setShowCreateGroup(false);
+          }}
         />
       )}
     </div>
