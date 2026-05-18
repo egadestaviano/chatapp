@@ -11,7 +11,7 @@ const QUICK_ACCOUNTS = [
   { name: "Alice", email: "alice@gmail.com", avatar: "/avatar1.jpg" },
   { name: "Bob", email: "bob@gmail.com", avatar: "/avatar2.jpg" },
   { name: "Carol", email: "carol@gmail.com", avatar: "/avatar3.jpg" },
-  { name: "Triananda", email: "user@gmail.com", avatar: null },
+  { name: "Devan", email: "user@gmail.com", avatar: null },
 ];
 
 export default function LoginPage() {
