@@ -54,7 +54,9 @@ export async function POST(req: NextRequest) {
 
       if (!res.ok) {
         const errText = await res.text().catch(() => "");
-        lastError = `Translation service error: ${res.status} ${errText}`;
+        const isHtml = /<[a-z][\s\S]*>/i.test(errText) || errText.trim().startsWith("<!DOCTYPE") || errText.trim().startsWith("<html");
+        const cleanErr = isHtml ? "Returned HTML page" : errText;
+        lastError = `Translation service error: ${res.status} ${cleanErr}`;
         console.warn(`Translation attempt failed for ${url}: ${lastError}`);
         continue;
       }

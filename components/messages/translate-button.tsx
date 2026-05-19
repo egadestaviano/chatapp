@@ -68,6 +68,10 @@ export function TranslateButton({
       });
       if (!res.ok) {
         const msg = await res.text().catch(() => "Translation failed");
+        const isHtml = /<[a-z][\s\S]*>/i.test(msg) || msg.trim().startsWith("<!DOCTYPE") || msg.trim().startsWith("<html");
+        if (isHtml) {
+          throw new Error("Translation service error. Please try again later.");
+        }
         throw new Error(msg);
       }
       const data = await res.json();
@@ -78,7 +82,12 @@ export function TranslateButton({
       });
     } catch (err: any) {
       console.error("translate error", err);
-      setError(err.message || "Translation failed");
+      let errMsg = err.message || "Translation failed";
+      const isHtml = /<[a-z][\s\S]*>/i.test(errMsg) || errMsg.trim().startsWith("<!DOCTYPE") || errMsg.trim().startsWith("<html");
+      if (isHtml) {
+        errMsg = "Translation service error. Please try again later.";
+      }
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
