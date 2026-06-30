@@ -251,7 +251,7 @@ export default function ChatApp() {
     const otherId =
       activeSession.participants?.find((participant) => participant.id !== session?.user?.id)?.id ?? null;
     setPanelUserId(otherId);
-  }, [allSessions, selectedSessionId, session?.user?.id]);
+  }, [selectedSessionId, session?.user?.id]);
 
   /**
    * GET SESSIONS
@@ -802,7 +802,6 @@ export default function ChatApp() {
           currentUserId={session?.user?.id}
           collapsed={sidebarCollapsed}
           onOpenNewChat={() => setShowNewChat(true)}
-          onExpand={() => setSidebarCollapsed(false)}
         />
 
         <div

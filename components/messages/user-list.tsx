@@ -34,7 +34,6 @@ interface UserListProps {
   selectedSessionId: string | null;
   onSelectSession: (sessionId: string) => void;
   onOpenNewChat?: () => void;
-  onStartChat: (userId: string) => void;
   collapsed?: boolean;
   currentUserId?: string | null;
 }
